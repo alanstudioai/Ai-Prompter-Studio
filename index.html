@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Creative Studio Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080b12;--s1:#0f1520;--s2:#161e2e;--bd:#1e2d45;--ac:#00e5ff;--ac2:#7c3aed;--ac3:#f59e0b;--tx:#e8edf5;--mu:#5a7091;--ok:#10b981;--er:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.05) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(124,58,237,.06) 0%,transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:820px;margin:0 auto;padding:0 16px 100px;position:relative;z-index:1}
+
+/* Header */
+header{padding:26px 0 28px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:100px;padding:5px 14px;font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.badge::before{content:'';width:6px;height:6px;background:var(--ac);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,42px);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--ac) 65%,var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--mu);font-size:13px;margin-top:7px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.chip{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;border:1px solid var(--bd);color:var(--mu);background:var(--s1)}
+
+/* API Box */
+.api-box{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:15px;margin-bottom:18px}
+.api-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+.api-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
+.api-body{margin-top:12px}
+.api-row{display:flex;gap:7px}
+.api-inp{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:9px 12px;color:var(--tx);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.api-inp:focus{border-color:var(--ac)}
+.api-st{font-size:11px;margin-top:5px;color:var(--mu)}
+.save-row{display:flex;align-items:center;gap:6px;margin-top:6px}
+.save-row label{font-size:11px;color:var(--mu);cursor:pointer;display:flex;align-items:center;gap:5px}
+.api-note{margin-top:9px;padding:9px 11px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--mu);line-height:1.8}
+
+/* Tabs */
+.tabs{display:flex;gap:0;background:var(--s2);border-radius:12px;padding:3px;margin-bottom:18px;border:1px solid var(--bd)}
+.tab{flex:1;padding:9px 6px;border-radius:9px;text-align:center;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--mu);transition:all .2s;border:none;background:none}
+.tab.active{background:var(--s1);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* Panels */
+.panel{display:none}.panel.active{display:block}
+
+/* Product Preset */
+.preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px}
+@media(max-width:480px){.preset-grid{grid-template-columns:repeat(2,1fr)}}
+.preset-btn{padding:10px 6px;border-radius:11px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .2s;text-align:center}
+.preset-btn:hover{border-color:var(--ac2)}
+.preset-btn.active{background:rgba(124,58,237,.15);border-color:var(--ac2)}
+.preset-icon{font-size:22px;display:block;margin-bottom:4px}
+.preset-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--tx)}
+
+/* Step Card */
+.step{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden;transition:border-color .3s}
+.step::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--sc,var(--ac)),transparent);opacity:0;transition:opacity .3s}
+.step.on::before,.step.done::before{opacity:1}
+.step.on{border-color:rgba(0,229,255,.2)}
+.step.done{border-color:rgba(16,185,129,.2);--sc:var(--ok)}
+.shdr{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.snum{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0}
+.s1 .snum{background:rgba(0,229,255,.12);color:var(--ac);border:1px solid rgba(0,229,255,.25)}
+.s2 .snum{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.25)}
+.s3 .snum{background:rgba(245,158,11,.12);color:var(--ac3);border:1px solid rgba(245,158,11,.25)}
+.s4 .snum{background:rgba(16,185,129,.12);color:var(--ok);border:1px solid rgba(16,185,129,.25)}
+.sinfo h2{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.sinfo p{font-size:11px;color:var(--mu);margin-top:1px}
+.sbadge{margin-left:auto;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.bw{background:rgba(90,112,145,.1);color:var(--mu);border:1px solid var(--bd)}
+.br{background:rgba(0,229,255,.08);color:var(--ac);border:1px solid rgba(0,229,255,.25)}
+.bd2{background:rgba(16,185,129,.1);color:var(--ok);border:1px solid rgba(16,185,129,.25)}
+
+/* Upload */
+.upzone{border:2px dashed var(--bd);border-radius:11px;padding:24px 14px;text-align:center;cursor:pointer;transition:all .3s;background:var(--s2);position:relative}
+.upzone:hover,.upzone.drag{border-color:var(--ac);background:rgba(0,229,255,.04)}
+.upzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upzone .ui{font-size:28px;margin-bottom:6px;display:block}
+.upzone h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.upzone p{font-size:11px;color:var(--mu)}
+
+/* Mood board grid */
+.mb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mb-slot{border:2px dashed var(--bd);border-radius:10px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;background:var(--s2)}
+.mb-slot:hover{border-color:var(--ac)}
+.mb-slot img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.mb-slot .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.mb-slot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.mb-add{font-size:24px;color:var(--mu)}
+
+/* Preview */
+.prev{border-radius:9px;overflow:hidden;border:1px solid var(--bd);margin-bottom:11px}
+.prev img{width:100%;max-height:220px;object-fit:cover;display:block}
+
+/* Fields */
+.fl{font-size:10px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+textarea.ci{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:9px 12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;resize:none;min-height:44px;max-height:88px;outline:none;transition:border-color .2s;line-height:1.5}
+textarea.ci:focus{border-color:var(--ac)}
+textarea.ci::placeholder{color:var(--mu)}
+
+/* Tone */
+.tone-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tbtn{padding:5px 10px;border-radius:100px;border:1px solid var(--bd);background:var(--s2);color:var(--mu);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.tbtn.on{background:rgba(0,229,255,.1);border-color:var(--ac);color:var(--ac)}
+
+/* Result / Versions */
+.rbox{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:12px;margin-top:10px}
+.rhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.rl{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.rt{font-size:13px;line-height:1.7;color:var(--tx);white-space:pre-wrap;max-height:150px;overflow-y:auto}
+.rt::-webkit-scrollbar{width:3px}
+.rt::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* 3-version grid */
+.ver-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.ver-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:12px;transition:border-color .2s}
+.ver-card:hover{border-color:var(--ac2)}
+.ver-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ver-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700}
+.ver-text{font-size:12px;line-height:1.7;color:var(--tx);white-space:pre-wrap}
+
+/* Platform Pack */
+.pack-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.pack-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:12px}
+.pack-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.pack-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--ac3)}
+.pack-text{font-size:12px;line-height:1.7;color:var(--tx);white-space:pre-wrap}
+
+/* Video single box */
+.vbox{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(245,158,11,.06));border:1px solid rgba(124,58,237,.25);border-radius:11px;padding:14px;margin-top:10px}
+.vtext{font-size:13px;line-height:1.8;color:var(--tx);white-space:pre-wrap}
+
+/* Hashtag box */
+.hbox{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:11px;padding:12px;margin-top:10px}
+.htags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.htag{padding:4px 11px;border-radius:100px;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:var(--ac);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.htag:hover{background:rgba(0,229,255,.2)}
+.htag.cp{background:rgba(16,185,129,.15);border-color:var(--ok);color:var(--ok)}
+
+/* Buttons */
+.btn{padding:10px 17px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.bp{background:linear-gradient(135deg,var(--ac),#0080ff);color:#000;box-shadow:0 3px 14px rgba(0,229,255,.2)}
+.bp:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 20px rgba(0,229,255,.35)}
+.bpu{background:linear-gradient(135deg,var(--ac2),#4f46e5);color:#fff;box-shadow:0 3px 14px rgba(124,58,237,.2)}
+.bpu:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 20px rgba(124,58,237,.35)}
+.ba{background:linear-gradient(135deg,var(--ac3),#f97316);color:#000;box-shadow:0 3px 14px rgba(245,158,11,.2)}
+.ba:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 20px rgba(245,158,11,.35)}
+.bg2{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.3)}
+.bg2:hover:not(:disabled){background:rgba(16,185,129,.25)}
+.bgh{background:var(--s2);color:var(--tx);border:1px solid var(--bd)}
+.bgh:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.brow{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+
+.cpbtn{padding:4px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:7px;color:var(--mu);font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;font-weight:600}
+.cpbtn:hover{border-color:var(--ac);color:var(--ac)}
+.cpbtn.ok{border-color:var(--ok);color:var(--ok);background:rgba(16,185,129,.1)}
+
+/* Platform grid step 3 */
+.plat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:7px 0 12px}
+.pbtn{padding:9px;border-radius:9px;border:1px solid var(--bd);background:var(--s2);color:var(--mu);cursor:pointer;transition:all .2s;text-align:center}
+.pbtn:hover{border-color:var(--ac2);color:#a78bfa}
+.pbtn.on{background:rgba(124,58,237,.15);border-color:var(--ac2);color:#a78bfa}
+.pn{display:block;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:1px}
+.pd{display:block;font-size:10px;opacity:.7}
+
+.conn{text-align:center;color:var(--mu);font-size:16px;margin:2px 0}
+.sp{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* History */
+.hist-panel{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:15px;margin-top:12px}
+.hi{display:flex;gap:9px;align-items:center;padding:8px;border-radius:8px;background:var(--s2);cursor:pointer;transition:border .2s;border:1px solid transparent;margin-bottom:6px}
+.hi:hover{border-color:var(--ac)}
+.hth{width:40px;height:40px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.hic{width:40px;height:40px;border-radius:7px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hinfo{flex:1;min-width:0}
+.htit{font-size:11px;font-weight:600;color:var(--tx)}
+.hex{font-size:10px;color:var(--mu);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.toast{position:fixed;bottom:16px;right:16px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 15px;font-size:12px;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:100;max-width:260px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(16,185,129,.4);color:var(--ok)}
+.toast.er{border-color:rgba(239,68,68,.4);color:var(--er)}
+
+hr.div{border:none;border-top:1px solid var(--bd);margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="badge">✦ AI Creative Studio Pro</div>
+  <h1>Generate. Swap. Animate.</h1>
+  <p class="sub">Prompt imej & video AI untuk semua jenis produk</p>
+  <div class="chips">
+    <span class="chip">👗 Fashion</span><span class="chip">👜 Accessories</span><span class="chip">💄 Beauty</span>
+    <span class="chip">📱 Gadget</span><span class="chip">🔥 Grok Aurora</span><span class="chip">✨ Google Flow</span>
+    <span class="chip">#️⃣ Hashtag</span><span class="chip">🖼️ Mood Board</span>
+  </div>
+</header>
+
+<!-- API KEY -->
+<div class="api-box">
+  <div class="api-hdr">
+    <div class="api-title">🔑 OpenRouter API Key</div>
+    <button style="font-size:11px;color:var(--ac);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif" id="atbtn" onclick="toggleApi()">Sembunyikan ▲</button>
+  </div>
+  <div class="api-body" id="abody">
+    <div class="api-row">
+      <input type="password" id="akey" class="api-inp" placeholder="sk-or-v1-..." oninput="onKey()">
+      <button class="btn bgh" style="padding:9px 11px;font-size:13px" id="eyebtn" onclick="toggleEye()">👁️</button>
+    </div>
+    <div id="ast" class="api-st">Masukkan OpenRouter API key</div>
+    <div class="save-row"><label><input type="checkbox" id="saveck" onchange="onSave()"> Simpan key (auto-ingat)</label></div>
+    <div class="api-note">💡 <strong style="color:#e8edf5">FREE:</strong> openrouter.ai → Sign Up → Keys → Create Key (sk-or-...)</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('main',this)">🎯 Studio</button>
+  <button class="tab" onclick="switchTab('moodboard',this)">🖼️ Mood Board</button>
+  <button class="tab" onclick="switchTab('enhance',this)">✨ Enhancer</button>
+  <button class="tab" onclick="switchTab('history',this)">📚 History</button>
+</div>
+
+<!-- ═══ MAIN STUDIO TAB ═══ -->
+<div id="tab-main" class="panel active">
+
+  <!-- Product Preset -->
+  <div class="step s1" style="--sc:var(--ac2)">
+    <div class="shdr">
+      <div class="snum" style="background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.25)">⚙️</div>
+      <div class="sinfo"><h2>Product Preset</h2><p>Pilih kategori produk untuk optimize semua prompt</p></div>
+    </div>
+    <div class="preset-grid" id="presetGrid">
+      <div class="preset-btn active" onclick="setPreset(this,'handbag')"><span class="preset-icon">👜</span><span class="preset-name">Handbag</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'skincare')"><span class="preset-icon">💄</span><span class="preset-name">Skincare</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'gadget')"><span class="preset-icon">📱</span><span class="preset-name">Gadget</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'baju_kurung')"><span class="preset-icon">👘</span><span class="preset-name">Baju Kurung</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'baju_melayu')"><span class="preset-icon">🧕</span><span class="preset-name">Baju Melayu</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'casual')"><span class="preset-icon">👕</span><span class="preset-name">Casual</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'dress')"><span class="preset-icon">👗</span><span class="preset-name">Dress</span></div>
+      <div class="preset-btn" onclick="setPreset(this,'custom')"><span class="preset-icon">✏️</span><span class="preset-name">Custom</span></div>
+    </div>
+    <div id="presetDesc" style="font-size:11px;color:var(--ac);font-weight:600;padding:6px 10px;background:rgba(124,58,237,.08);border-radius:8px;border:1px solid rgba(124,58,237,.2)">
+      👜 Handbag — leather texture, hardware detail, luxury editorial style
+    </div>
+  </div>
+
+  <div class="conn">↓</div>
+
+  <!-- STEP 1 -->
+  <div class="step s1" id="c1">
+    <div class="shdr">
+      <div class="snum">1</div>
+      <div class="sinfo"><h2>Reference Image</h2><p>Upload model / background / scene</p></div>
+      <span class="sbadge br" id="b1">Ready</span>
+    </div>
+    <div class="upzone" id="uz1" ondragover="dg(event,'1')" ondragleave="dl('1')" ondrop="dp(event,'1')">
+      <input type="file" accept="image/*" id="fi1" onchange="hf(event,'1')">
+      <span class="ui">🖼️</span><h3>Drop reference image here</h3><p>PNG JPG WEBP • klik atau drag</p>
+    </div>
+    <div id="sb1" style="display:none">
+      <div class="prev" style="margin-top:11px"><img id="pv1" src="" alt=""></div>
+      <div class="fl">✍️ Arahan tambahan (optional)</div>
+      <textarea class="ci" id="ch1" placeholder="Cth: fokus background urban, golden hour, editorial style..." rows="2"></textarea>
+      <div class="fl" style="margin-top:10px">🎨 Tone / Mood</div>
+      <div class="tone-row" id="trow">
+        <span class="tbtn on" onclick="setTone(this,'Cinematic')">🎬 Cinematic</span>
+        <span class="tbtn" onclick="setTone(this,'Luxury')">💎 Luxury</span>
+        <span class="tbtn" onclick="setTone(this,'Minimal')">⬜ Minimal</span>
+        <span class="tbtn" onclick="setTone(this,'Editorial')">📰 Editorial</span>
+        <span class="tbtn" onclick="setTone(this,'Lifestyle')">🌿 Lifestyle</span>
+        <span class="tbtn" onclick="setTone(this,'Bold')">🔥 Bold</span>
+        <span class="tbtn" onclick="setTone(this,'Soft Pastel')">🌸 Pastel</span>
+        <span class="tbtn" onclick="setTone(this,'Dark Moody')">🌑 Moody</span>
+      </div>
+      <div class="rbox" id="r1b" style="display:none">
+        <div class="rhdr"><span class="rl">📝 Scene Prompt</span><button class="cpbtn" onclick="cp('r1t',this)">Copy</button></div>
+        <div class="rt" id="r1t"></div>
+      </div>
+      <div class="brow">
+        <button class="btn bp" id="btn1" onclick="doS1()">✨ Generate Prompt</button>
+        <button class="btn bgh" onclick="rst(1)">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn">↓</div>
+
+  <!-- STEP 2 -->
+  <div class="step s2" id="c2">
+    <div class="shdr">
+      <div class="snum">2</div>
+      <div class="sinfo"><h2>Product Image</h2><p>Auto swap produk masuk scene reference</p></div>
+      <span class="sbadge bw" id="b2">Step 1 dulu</span>
+    </div>
+    <div class="upzone" id="uz2" ondragover="dg(event,'2')" ondragleave="dl('2')" ondrop="dp(event,'2')">
+      <input type="file" accept="image/*" id="fi2" onchange="hf(event,'2')">
+      <span class="ui">📦</span><h3>Drop product image here</h3><p>Produk akan diswap ke dalam scene</p>
+    </div>
+    <div id="sb2" style="display:none">
+      <div class="prev" style="margin-top:11px"><img id="pv2" src="" alt=""></div>
+      <div class="fl">✍️ Arahan swap (optional)</div>
+      <textarea class="ci" id="ch2" placeholder="Cth: pegang tangan kanan, close-up label, soft studio lighting..." rows="2"></textarea>
+
+      <!-- 3 Versions -->
+      <div id="verbox" style="display:none">
+        <hr class="div">
+        <div class="rhdr" style="margin-bottom:4px">
+          <span class="rl">🎭 3 Versi Prompt — pilih yang terbaik</span>
+          <button class="cpbtn" onclick="cpAll()">Copy All</button>
+        </div>
+        <div class="ver-grid">
+          <div class="ver-card">
+            <div class="ver-hdr"><span class="ver-label" style="color:var(--ac)">1️⃣ Conservative</span><button class="cpbtn" onclick="cp('v1t',this)">Copy</button></div>
+            <div class="ver-text" id="v1t"></div>
+          </div>
+          <div class="ver-card">
+            <div class="ver-hdr"><span class="ver-label" style="color:var(--ac2)">2️⃣ Cinematic</span><button class="cpbtn" onclick="cp('v2t',this)">Copy</button></div>
+            <div class="ver-text" id="v2t"></div>
+          </div>
+          <div class="ver-card">
+            <div class="ver-hdr"><span class="ver-label" style="color:var(--ac3)">3️⃣ Bold & Dramatic</span><button class="cpbtn" onclick="cp('v3t',this)">Copy</button></div>
+            <div class="ver-text" id="v3t"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brow">
+        <button class="btn bpu" id="btn2" onclick="doS2()">🎭 Generate 3 Versi Prompt</button>
+        <button class="btn bgh" onclick="rst(2)">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="conn">↓</div>
+
+  <!-- STEP 3 — Platform Pack -->
+  <div class="step s3" id="c3">
+    <div class="shdr">
+      <div class="snum">3</div>
+      <div class="sinfo"><h2>Platform Pack</h2><p>Semua platform prompt — 1 klik generate semua</p></div>
+      <span class="sbadge bw" id="b3">Step 2 dulu</span>
+    </div>
+    <div class="fl">🎬 Pilih Platform</div>
+    <div class="plat-grid">
+      <div class="pbtn" onclick="togglePlat(this,'grok6')"><span class="pn">🔥 Grok Aurora</span><span class="pd">6 saat</span></div>
+      <div class="pbtn" onclick="togglePlat(this,'grok10')"><span class="pn">🔥 Grok Aurora</span><span class="pd">10 saat</span></div>
+      <div class="pbtn" onclick="togglePlat(this,'flow8')"><span class="pn">✨ Google Flow</span><span class="pd">8 saat</span></div>
+      <div class="pbtn" onclick="togglePlat(this,'kling')"><span class="pn">🎥 Kling AI</span><span class="pd">5 saat</span></div>
+    </div>
+    <div class="fl" style="margin-top:4px">✍️ Arahan video (optional)</div>
+    <textarea class="ci" id="ch3" placeholder="Cth: slow zoom in, tangan angkat produk, background blur, berkilat..." rows="2"></textarea>
+    <div class="brow">
+      <button class="btn ba" id="btn3" onclick="doS3()" disabled>🚀 Generate Platform Pack</button>
+    </div>
+    <div id="packbox" style="display:none">
+      <div class="pack-grid" id="packgrid"></div>
+    </div>
+  </div>
+
+  <div class="conn">↓</div>
+
+  <!-- STEP 4 — Hashtag -->
+  <div class="step s4" id="c4">
+    <div class="shdr">
+      <div class="snum">#</div>
+      <div class="sinfo"><h2>Hashtag Generator</h2><p>Auto generate hashtag IG/TikTok dari produk</p></div>
+      <span class="sbadge bw" id="b4">Step 1 dulu</span>
+    </div>
+    <div class="fl">🌐 Platform</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <span class="tbtn on" onclick="setHashPlat(this,'Instagram')">📸 Instagram</span>
+      <span class="tbtn" onclick="setHashPlat(this,'TikTok')">🎵 TikTok</span>
+      <span class="tbtn" onclick="setHashPlat(this,'Facebook')">👥 Facebook</span>
+    </div>
+    <div class="brow" style="margin-top:4px">
+      <button class="btn bg2" id="btn4" onclick="doHash()" disabled>🏷️ Generate Hashtags</button>
+    </div>
+    <div id="hashbox" style="display:none">
+      <div class="hbox">
+        <div class="rhdr">
+          <span class="rl" style="color:var(--ac)">#️⃣ Hashtags — klik untuk copy satu-satu</span>
+          <button class="cpbtn" onclick="cp('hashall',this)">Copy All</button>
+        </div>
+        <div id="hashall" style="display:none"></div>
+        <div class="htags" id="htaglist"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main tab -->
+
+<!-- ═══ MOOD BOARD TAB ═══ -->
+<div id="tab-moodboard" class="panel">
+  <div class="step" style="border-color:rgba(0,229,255,.2)">
+    <div class="shdr">
+      <div class="snum" style="background:rgba(0,229,255,.12);color:var(--ac);border:1px solid rgba(0,229,255,.25)">🖼️</div>
+      <div class="sinfo"><h2>Mood Board Blender</h2><p>Upload 2-5 reference → blend jadi 1 master prompt</p></div>
+    </div>
+    <div class="mb-grid" id="mbgrid">
+      <!-- slots injected by JS -->
+    </div>
+    <div class="fl">✍️ Arahan blend (optional)</div>
+    <textarea class="ci" id="mbchat" placeholder="Cth: ambil lighting dari gambar 1, pose dari gambar 2, background dari gambar 3..." rows="2"></textarea>
+    <div class="fl" style="margin-top:10px">🎨 Tone Output</div>
+    <div class="tone-row" id="mbtone">
+      <span class="tbtn on" onclick="setMbTone(this,'Cinematic')">🎬 Cinematic</span>
+      <span class="tbtn" onclick="setMbTone(this,'Luxury')">💎 Luxury</span>
+      <span class="tbtn" onclick="setMbTone(this,'Editorial')">📰 Editorial</span>
+      <span class="tbtn" onclick="setMbTone(this,'Lifestyle')">🌿 Lifestyle</span>
+      <span class="tbtn" onclick="setMbTone(this,'Bold')">🔥 Bold</span>
+    </div>
+    <div class="rbox" id="mbresult" style="display:none">
+      <div class="rhdr"><span class="rl">🖼️ Blended Master Prompt</span><button class="cpbtn" onclick="cp('mbtext',this)">Copy</button></div>
+      <div class="rt" id="mbtext"></div>
+    </div>
+    <div class="brow">
+      <button class="btn bp" id="mbbtn" onclick="doMoodBoard()">🎨 Blend & Generate Prompt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ENHANCER TAB ═══ -->
+<div id="tab-enhance" class="panel">
+  <div class="step" style="border-color:rgba(245,158,11,.2)">
+    <div class="shdr">
+      <div class="snum" style="background:rgba(245,158,11,.12);color:var(--ac3);border:1px solid rgba(245,158,11,.25)">✨</div>
+      <div class="sinfo"><h2>Prompt Enhancer</h2><p>Tulis prompt ringkas → sistem polish jadi pro</p></div>
+    </div>
+    <div class="fl">✏️ Prompt kau (ringkas pun okay)</div>
+    <textarea class="ci" id="enhIn" placeholder="Cth: perempuan pegang handbag dalam kereta, cantik..." rows="3" style="max-height:120px"></textarea>
+    <div class="fl" style="margin-top:10px">🎯 Enhance untuk</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="enhTarget">
+      <span class="tbtn on" onclick="setEnhTarget(this,'Midjourney')">Midjourney</span>
+      <span class="tbtn" onclick="setEnhTarget(this,'Flux')">Flux</span>
+      <span class="tbtn" onclick="setEnhTarget(this,'DALL-E')">DALL-E</span>
+      <span class="tbtn" onclick="setEnhTarget(this,'Grok Aurora')">Grok Aurora</span>
+      <span class="tbtn" onclick="setEnhTarget(this,'Google Flow')">Google Flow</span>
+    </div>
+    <div class="rbox" id="enhResult" style="display:none">
+      <div class="rhdr"><span class="rl">✨ Enhanced Prompt</span><button class="cpbtn" onclick="cp('enhOut',this)">Copy</button></div>
+      <div class="rt" id="enhOut" style="max-height:200px"></div>
+    </div>
+    <div class="brow">
+      <button class="btn ba" id="enhBtn" onclick="doEnhance()">✨ Enhance Prompt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORY TAB ═══ -->
+<div id="tab-history" class="panel">
+  <div class="hist-panel" id="histpanel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">📚 Prompt History</div>
+      <button class="btn bgh" style="padding:5px 10px;font-size:11px" onclick="clearHist()">Clear All</button>
+    </div>
+    <div id="histlist"><div style="text-align:center;color:var(--mu);padding:20px;font-size:13px">Belum ada history lagi</div></div>
+  </div>
+</div>
+
+</div><!-- wrap -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────
+const S = {
+  ref:{b64:null,prompt:null,analysis:null},
+  prod:{b64:null,prompt:null,analysis:null},
+  preset:'handbag', tone:'Cinematic',
+  platform:{grok6:false,grok10:false,flow8:false,kling:false},
+  hashPlat:'Instagram', enhTarget:'Midjourney',
+  mbImages:[], mbTone:'Cinematic',
+  s1done:false, s2done:false
+};
+
+// ─── Preset configs ───────────────────────────────────
+const PRESETS = {
+  handbag:{name:'👜 Handbag',desc:'leather texture, hardware detail, luxury editorial style',style:'luxury leather goods photography, structured handbag, gold hardware details, clean background'},
+  skincare:{name:'💄 Skincare',desc:'clean minimal, glass skin, dewy product shot',style:'clean beauty product photography, soft diffused lighting, glass skin, dewy finish, minimal white background'},
+  gadget:{name:'📱 Gadget',desc:'tech editorial, sharp detail, studio lighting',style:'professional tech product photography, sharp details, studio lighting, dark background, sleek modern'},
+  baju_kurung:{name:'👘 Baju Kurung',desc:'elegant Malay attire, traditional, modest fashion',style:'elegant Malaysian traditional fashion photography, baju kurung, modest styling, soft natural lighting, cultural aesthetic'},
+  baju_melayu:{name:'🧕 Baju Melayu',desc:'traditional Malay menswear, raya/formal style',style:'Malaysian traditional menswear photography, baju melayu, sampin, formal elegant styling'},
+  casual:{name:'👕 Casual',desc:'streetwear, lifestyle, relaxed urban style',style:'lifestyle fashion photography, casual streetwear, urban setting, natural light, relaxed confident pose'},
+  dress:{name:'👗 Dress',desc:'feminine elegant, flowing fabric, fashion editorial',style:'elegant fashion editorial photography, flowing dress, feminine styling, soft romantic lighting'},
+  custom:{name:'✏️ Custom',desc:'no specific preset — prompt akan generic',style:'professional product photography, high quality, detailed, realistic'}
+};
+
+// ─── Init ─────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  const k=localStorage.getItem('or_key');
+  if(k){
+    document.getElementById('akey').value=k;
+    document.getElementById('saveck').checked=true;
+    checkKey();
+    // Auto collapse since key is saved
+    setTimeout(()=>{ if(apiOpen) toggleApi(); },300);
+  }
+  initMoodBoard();
+  renderHist();
+});
+
+// ─── Tabs ─────────────────────────────────────────────
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ─── API ──────────────────────────────────────────────
+let apiOpen=true;
+function toggleApi(){
+  apiOpen=!apiOpen;
+  document.getElementById('abody').style.display=apiOpen?'block':'none';
+  document.getElementById('atbtn').textContent=apiOpen?'Sembunyikan ▲':'Tunjuk ▼';
+}
+function getKey(){return document.getElementById('akey').value.trim();}
+function onKey(){checkKey();if(document.getElementById('saveck').checked)localStorage.setItem('or_key',getKey());}
+function onSave(){
+  if(document.getElementById('saveck').checked){
+    const k=getKey();
+    if(k&&k.startsWith('sk-or-')){
+      localStorage.setItem('or_key',k);
+      toast('✓ Key disimpan & dikunci!');
+      // Auto collapse API box after saving
+      setTimeout(()=>{if(apiOpen){toggleApi();}},800);
+    } else {
+      toast('Isi API key yang betul dulu','er');
+      document.getElementById('saveck').checked=false;
+    }
+  }else{localStorage.removeItem('or_key');toast('Key tidak disimpan');}
+}
+function checkKey(){
+  const k=getKey(),s=document.getElementById('ast'),i=document.getElementById('akey');
+  if(!k){s.textContent='Masukkan OpenRouter API key';s.style.color='var(--mu)';i.style.borderColor='var(--bd)';}
+  else if(!k.startsWith('sk-or-')){s.textContent='⚠️ Format salah — mesti bermula sk-or-...';s.style.color='var(--ac3)';i.style.borderColor='var(--ac3)';}
+  else{s.textContent='✓ API key sedia digunakan';s.style.color='var(--ok)';i.style.borderColor='var(--ok)';}
+}
+function toggleEye(){const i=document.getElementById('akey'),b=document.getElementById('eyebtn');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁️':'🙈';}
+
+// ─── Toast ────────────────────────────────────────────
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;setTimeout(()=>t.className='toast',3000);}
+
+// ─── Copy ─────────────────────────────────────────────
+function cp(id,btn){
+  const txt=document.getElementById(id).textContent;
+  const done=()=>{if(btn){btn.textContent='✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},2000);}toast('✓ Copied!');};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done).catch(()=>fbCopy(txt,done));
+  else fbCopy(txt,done);
+}
+function fbCopy(txt,cb){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);cb();}
+function cpAll(){
+  const all=[document.getElementById('v1t').textContent,document.getElementById('v2t').textContent,document.getElementById('v3t').textContent].join('\n\n---\n\n');
+  const ta=document.createElement('textarea');ta.value=all;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);toast('✓ Semua 3 versi copied!');
+}
+
+// ─── Preset ───────────────────────────────────────────
+function setPreset(el,key){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); S.preset=key;
+  document.getElementById('presetDesc').textContent=PRESETS[key].name+' — '+PRESETS[key].desc;
+}
+
+// ─── Tone ─────────────────────────────────────────────
+function setTone(el,t){document.querySelectorAll('#trow .tbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');S.tone=t;}
+function setMbTone(el,t){document.querySelectorAll('#mbtone .tbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');S.mbTone=t;}
+function setHashPlat(el,p){document.querySelectorAll('.step.s4 .tbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');S.hashPlat=p;}
+function setEnhTarget(el,t){document.querySelectorAll('#enhTarget .tbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');S.enhTarget=t;}
+
+// ─── Platform toggle ──────────────────────────────────
+function togglePlat(el,key){
+  el.classList.toggle('on');
+  S.platform[key]=el.classList.contains('on');
+}
+
+// ─── Upload ───────────────────────────────────────────
+function dg(e,id){e.preventDefault();document.getElementById('uz'+id).classList.add('drag');}
+function dl(id){document.getElementById('uz'+id).classList.remove('drag');}
+function dp(e,id){e.preventDefault();dl(id);const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))lf(f,id);else toast('Sila upload imej','er');}
+function hf(e,id){if(e.target.files[0])lf(e.target.files[0],id);}
+function lf(file,id){
+  const r=new FileReader();
+  r.onload=ev=>{
+    const b64=ev.target.result.split(',')[1],url=ev.target.result;
+    if(id==='1'){S.ref.b64=b64;document.getElementById('pv1').src=url;document.getElementById('uz1').style.display='none';document.getElementById('sb1').style.display='block';document.getElementById('c1').classList.add('on');}
+    else{S.prod.b64=b64;document.getElementById('pv2').src=url;document.getElementById('uz2').style.display='none';document.getElementById('sb2').style.display='block';document.getElementById('c2').classList.add('on');}
+  };
+  r.readAsDataURL(file);
+}
+
+// ─── Reset ────────────────────────────────────────────
+function rst(n){
+  if(n===1){S.ref={b64:null,prompt:null,analysis:null};S.s1done=false;document.getElementById('uz1').style.display='block';document.getElementById('sb1').style.display='none';document.getElementById('r1b').style.display='none';document.getElementById('c1').classList.remove('on','done');document.getElementById('b1').textContent='Ready';document.getElementById('b1').className='sbadge br';document.getElementById('fi1').value='';}
+  else{S.prod={b64:null,prompt:null,analysis:null};S.s2done=false;document.getElementById('uz2').style.display='block';document.getElementById('sb2').style.display='none';document.getElementById('verbox').style.display='none';document.getElementById('c2').classList.remove('on','done');document.getElementById('b2').textContent='Step 1 dulu';document.getElementById('b2').className='sbadge bw';document.getElementById('btn3').disabled=true;document.getElementById('btn4').disabled=true;document.getElementById('packbox').style.display='none';document.getElementById('hashbox').style.display='none';document.getElementById('fi2').value='';}
+}
+
+// ─── AI Call ──────────────────────────────────────────
+async function ai(messages,sys){
+  const k=getKey();
+  if(!k)throw new Error('API key belum diisi!');
+  if(!k.startsWith('sk-or-'))throw new Error('Format API key salah. Mesti sk-or-...');
+  const msgs=[];
+  if(sys)msgs.push({role:'system',content:sys});
+  for(const m of messages){
+    if(Array.isArray(m.content)){
+      const parts=m.content.map(c=>c.type==='text'?{type:'text',text:c.text}:{type:'image_url',image_url:{url:`data:${c.source.media_type};base64,${c.source.data}`}});
+      msgs.push({role:m.role||'user',content:parts});
+    }else msgs.push({role:m.role||'user',content:m.content});
+  }
+  const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${k}`,'HTTP-Referer':'https://ai-creative-studio.app','X-Title':'AI Creative Studio Pro'},body:JSON.stringify({model:'openrouter/auto',messages:msgs,max_tokens:1800,temperature:.75})});
+  const d=await res.json();
+  if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+  return d.choices?.[0]?.message?.content||'';
+}
+
+// ─── Step 1 ───────────────────────────────────────────
+async function doS1(){
+  if(!S.ref.b64)return;
+  const btn=document.getElementById('btn1');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Analyzing...';
+  const extra=document.getElementById('ch1').value.trim();
+  const pconf=PRESETS[S.preset];
+  try{
+    const res=await ai([{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:S.ref.b64}},
+      {type:'text',text:`Analyze this REFERENCE image in extreme detail. This is a reference scene that will be used to place a different product — everything in the scene must be preserved exactly.
+
+Capture ALL of these:
+- Background & environment (exact description)
+- Lighting: direction, quality, color temperature, shadows
+- Model/person: pose, hand position, body angle (if present)
+- Camera: angle, focal length feel, depth of field
+- Color grading & overall mood
+- Any props, surfaces, textures visible
+
+Product category context: ${pconf.name}. Tone: ${S.tone}.
+${extra?'Additional notes: '+extra:''}
+
+Format:
+ANALYSIS:
+[Detailed scene analysis covering all elements above — this is crucial for accurate product placement]
+
+PROMPT:
+[Complete image generation prompt that fully recreates this scene, detailed enough that the exact same scene can be reproduced with a different product placed in it]`}
+    ]}],'You are an expert AI image prompt engineer. Analyze reference images in extreme detail — capture every element: exact background, lighting quality, color temperature, model pose, hand positions, camera angle, depth of field, mood, atmosphere. This analysis will be used to recreate the EXACT same scene with a different product.');
+    const analysis=res.match(/ANALYSIS:\n?([\s\S]*?)(?=\nPROMPT:|$)/)?.[1]?.trim()||'';
+    const prompt=res.match(/PROMPT:\n?([\s\S]*?)$/)?.[1]?.trim()||res;
+    S.ref.analysis=analysis;S.ref.prompt=prompt;
+    document.getElementById('r1t').textContent=prompt;
+    document.getElementById('r1b').style.display='block';
+    S.s1done=true;
+    document.getElementById('c1').classList.replace('on','done');
+    document.getElementById('b1').textContent='✓ Done';document.getElementById('b1').className='sbadge bd2';
+    document.getElementById('b2').textContent='Ready';document.getElementById('b2').className='sbadge br';
+    document.getElementById('btn4').disabled=false;
+    document.getElementById('b4').textContent='Ready';document.getElementById('b4').className='sbadge br';
+    toast('✓ Scene prompt generated!');
+    saveHist('ref',document.getElementById('pv1').src,prompt,'Scene Prompt');
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='✨ Re-Generate';
+}
+
+// ─── Step 2 — 3 versions ─────────────────────────────
+async function doS2(){
+  if(!S.prod.b64)return;
+  const btn=document.getElementById('btn2');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generating 3 versions...';
+  const extra=document.getElementById('ch2').value.trim();
+  const pconf=PRESETS[S.preset];
+  const content=[];
+  if(S.ref.b64){content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:S.ref.b64}});content.push({type:'text',text:'[IMAGE 1: Reference scene]'});}
+  content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:S.prod.b64}});
+  content.push({type:'text',text:S.ref.b64
+    ? `[IMAGE 2: Product only — to be placed into the reference scene]
+
+CRITICAL TASK: Product placement into reference scene.
+- Image 1 is the REFERENCE: keep ALL of these EXACTLY the same → background, environment, lighting direction, lighting quality, color grading, model/person pose, hand position, camera angle, depth of field, mood, atmosphere, overall composition.
+- Image 2 is the PRODUCT: extract ONLY the product item itself (ignore its background/lighting).
+- The output prompt should describe the EXACT scene from Image 1, but with the product from Image 2 REPLACING the original item being held/displayed.
+- The product should fit naturally in the model's hand/position as if it was always there.
+
+Product category: ${pconf.name}. Style: ${pconf.style}.
+${extra?'Additional instructions: '+extra:''}
+
+Generate 3 prompt versions — all keep the SAME reference scene, only differ in prompt style/detail level:
+
+VERSION1_CONSERVATIVE:
+[Clean natural description — same scene, product integrated naturally]
+
+VERSION2_CINEMATIC:
+[Same scene but with cinematic/editorial language — rich descriptive details]
+
+VERSION3_BOLD:
+[Same scene but with bold dramatic language — maximum visual impact description]`
+    : `[IMAGE 1: Product to create professional photo for]
+Product category: ${pconf.name}. Style: ${pconf.style}.
+${extra?'Instructions: '+extra:''}
+Generate 3 professional product photo prompts:
+VERSION1_CONSERVATIVE:
+VERSION2_CINEMATIC:
+VERSION3_BOLD:`
+  });
+  try{
+    const res=await ai([{role:'user',content}],'Expert AI image prompt engineer specializing in product photography and fashion.');
+    // Robust parsing — handle both exact format and markdown headers
+    let v1='',v2='',v3='';
+    // Try exact format first
+    v1=res.match(/VERSION1_CONSERVATIVE:\n?([\s\S]*?)(?=\nVERSION2_|$)/)?.[1]?.trim()||'';
+    v2=res.match(/VERSION2_CINEMATIC:\n?([\s\S]*?)(?=\nVERSION3_|$)/)?.[1]?.trim()||'';
+    v3=res.match(/VERSION3_BOLD:\n?([\s\S]*?)$/)?.[1]?.trim()||'';
+    // Fallback: try markdown ## headers
+    if(!v1||!v2||!v3){
+      const parts=res.split(/\n(?=##|\*\*VERSION|VERSION\d)/i);
+      if(parts.length>=3){v1=parts[0].replace(/^#+\s*/,'').trim();v2=parts[1].replace(/^#+\s*/,'').trim();v3=parts[2].replace(/^#+\s*/,'').trim();}
+      else if(parts.length===2){v1=parts[0].replace(/^#+\s*/,'').trim();v2=parts[1].replace(/^#+\s*/,'').trim();v3=v2;}
+      else{v1=res;v2=res;v3=res;}
+    }
+    // Clean markdown bold/headers from prompts
+    const clean=(t)=>t.replace(/\*\*(.*?)\*\*/g,'$1').replace(/^#+\s*/gm,'').replace(/^(Prompt:|VERSION\d[^:]*:)/gim,'').trim();
+    v1=clean(v1);v2=clean(v2);v3=clean(v3)||v2;
+    document.getElementById('v1t').textContent=v1;
+    document.getElementById('v2t').textContent=v2;
+    document.getElementById('v3t').textContent=v3;
+    document.getElementById('verbox').style.display='block';
+    S.prod.prompt=v2;S.prod.analysis='Product analyzed.';S.s2done=true;
+    document.getElementById('c2').classList.replace('on','done');
+    document.getElementById('b2').textContent='✓ Done';document.getElementById('b2').className='sbadge bd2';
+    document.getElementById('b3').textContent='Ready';document.getElementById('b3').className='sbadge br';
+    document.getElementById('btn3').disabled=false;
+    document.getElementById('c3').classList.add('on');
+    toast('✓ 3 versi prompt generated!');
+    saveHist('product',document.getElementById('pv2').src,v2,'Product Swap (Cinematic)');
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='🎭 Re-Generate 3 Versi';
+}
+
+// ─── Step 3 — Platform Pack ───────────────────────────
+async function doS3(){
+  if(!S.s2done)return;
+  const btn=document.getElementById('btn3');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generating all platforms...';
+  const extra=document.getElementById('ch3').value.trim();
+  const basePrompt=S.prod.prompt||S.ref.prompt;
+  const activePlats=[];
+  if(S.platform.grok6)activePlats.push({key:'grok6',name:'🔥 Grok Aurora 6s',guide:'Grok Aurora 6s: concise vivid ~100 words, ONE motion, cinematic photorealistic.'});
+  if(S.platform.grok10)activePlats.push({key:'grok10',name:'🔥 Grok Aurora 10s',guide:'Grok Aurora 10s: two motion phases, ~150 words, cinematic storytelling.'});
+  if(S.platform.flow8)activePlats.push({key:'flow8',name:'✨ Google Flow 8s',guide:'Google Flow 8s: descriptive natural language, include subject+environment+lighting+camera+mood.'});
+  if(S.platform.kling)activePlats.push({key:'kling',name:'🎥 Kling AI 5s',guide:'Kling AI 5s: motion keywords (push in/pull out/pan), smooth cinematic movement.'});
+  if(!activePlats.length){toast('Pilih sekurang-kurangnya 1 platform','er');btn.disabled=false;btn.innerHTML='🚀 Generate Platform Pack';return;}
+  const platStr=activePlats.map((p,i)=>`PLATFORM${i+1}_${p.key.toUpperCase()}:\n[Guide: ${p.guide}]`).join('\n\n');
+  try{
+    const res=await ai([{role:'user',content:`Create video AI prompts for these platforms based on this scene:
+
+IMAGE PROMPT: ${basePrompt}
+${S.prod.analysis?'PRODUCT: '+S.prod.analysis:''}
+${S.ref.analysis?'SCENE: '+S.ref.analysis:''}
+${extra?'USER INSTRUCTIONS: '+extra:''}
+
+Generate ONE prompt per platform. Each optimized for that platform's style and duration.
+
+${activePlats.map((p,i)=>`PLATFORM${i+1}_${p.key.toUpperCase()}:\n[${p.guide}]`).join('\n\n')}
+
+Output format — use these exact headers:`}],'Expert video AI prompt engineer for all major platforms.');
+    const packgrid=document.getElementById('packgrid');
+    packgrid.innerHTML='';
+    activePlats.forEach((p,i)=>{
+      const regex=new RegExp(`PLATFORM${i+1}_${p.key.toUpperCase()}:\\n?([\\s\\S]*?)(?=\\nPLATFORM${i+2}_|$)`);
+      const match=res.match(regex)?.[1]?.trim()||res;
+      const vid=`pack_${p.key}`;
+      packgrid.innerHTML+=`<div class="pack-card"><div class="pack-hdr"><span class="pack-label">${p.name}</span><button class="cpbtn" onclick="cp('${vid}',this)">Copy</button></div><div class="pack-text" id="${vid}">${match}</div></div>`;
+      saveHist('video',null,match,p.name);
+    });
+    document.getElementById('packbox').style.display='block';
+    document.getElementById('c3').classList.replace('on','done');
+    document.getElementById('b3').textContent='✓ Done';document.getElementById('b3').className='sbadge bd2';
+    toast(`🚀 ${activePlats.length} platform prompts generated!`);
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='🚀 Re-Generate Pack';
+}
+
+// ─── Step 4 — Hashtag ────────────────────────────────
+async function doHash(){
+  if(!S.s1done)return;
+  const btn=document.getElementById('btn4');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generating...';
+  const pconf=PRESETS[S.preset];
+  try{
+    const res=await ai([{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:S.ref.b64}},
+      {type:'text',text:`Generate 30 relevant ${S.hashPlat} hashtags for this product image.
+Product category: ${pconf.name}
+Platform: ${S.hashPlat}
+Mix: popular hashtags + niche hashtags + Malaysian/local hashtags where relevant.
+Output ONLY hashtags separated by spaces, no explanation. Start each with #.`}
+    ]}],'Social media hashtag expert for Malaysian market.');
+    const tags=res.match(/#\w+/g)||[];
+    const allText=tags.join(' ');
+    document.getElementById('hashall').textContent=allText;
+    const list=document.getElementById('htaglist');
+    list.innerHTML=tags.map(t=>`<span class="htag" onclick="cpTag(this,'${t}')">${t}</span>`).join('');
+    document.getElementById('hashbox').style.display='block';
+    document.getElementById('c4').classList.add('done');
+    document.getElementById('b4').textContent='✓ Done';document.getElementById('b4').className='sbadge bd2';
+    toast(`✓ ${tags.length} hashtags generated!`);
+    saveHist('hash',null,allText,`Hashtags ${S.hashPlat}`);
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='🏷️ Re-Generate Hashtags';
+}
+function cpTag(el,tag){
+  fbCopy(tag,()=>{el.classList.add('cp');el.textContent='✓'+tag;setTimeout(()=>{el.classList.remove('cp');el.textContent=tag;},1500);});
+}
+
+// ─── Mood Board ───────────────────────────────────────
+function initMoodBoard(){
+  const grid=document.getElementById('mbgrid');
+  grid.innerHTML='';
+  for(let i=0;i<5;i++){
+    grid.innerHTML+=`<div class="mb-slot" id="mbs${i}" onclick="trigMb(${i})">
+      <input type="file" accept="image/*" id="mbf${i}" onchange="loadMb(event,${i})" style="display:none">
+      <span class="mb-add">+</span>
+    </div>`;
+  }
+  S.mbImages=new Array(5).fill(null);
+}
+function trigMb(i){document.getElementById('mbf'+i).click();}
+function loadMb(e,i){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    S.mbImages[i]={b64:ev.target.result.split(',')[1],url:ev.target.result};
+    const slot=document.getElementById('mbs'+i);
+    slot.innerHTML=`<img src="${ev.target.result}"><button class="rm" onclick="rmMb(event,${i})">✕</button>`;
+  };
+  r.readAsDataURL(f);
+}
+function rmMb(e,i){e.stopPropagation();S.mbImages[i]=null;const slot=document.getElementById('mbs'+i);slot.innerHTML='<input type="file" accept="image/*" id="mbf'+i+'" onchange="loadMb(event,'+i+')" style="display:none"><span class="mb-add">+</span>';}
+async function doMoodBoard(){
+  const imgs=S.mbImages.filter(x=>x);
+  if(imgs.length<2){toast('Upload sekurang-kurangnya 2 gambar','er');return;}
+  const btn=document.getElementById('mbbtn');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Blending...';
+  const extra=document.getElementById('mbchat').value.trim();
+  const content=[];
+  imgs.forEach((img,i)=>{content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:img.b64}});content.push({type:'text',text:`[IMAGE ${i+1}]`});});
+  content.push({type:'text',text:`You have ${imgs.length} reference images. Analyze and blend ALL of them into ONE master AI image prompt.
+Extract the best elements from each: lighting, composition, mood, colors, style, setting.
+Tone: ${S.mbTone}
+${extra?'Special instructions: '+extra:''}
+Generate a single comprehensive master prompt that combines all reference elements.
+Output ONLY the prompt, no explanation.`});
+  try{
+    const res=await ai([{role:'user',content}],'Expert AI image prompt engineer. Blend multiple references into one perfect prompt.');
+    document.getElementById('mbtext').textContent=res.trim();
+    document.getElementById('mbresult').style.display='block';
+    toast('✓ Mood board blended!');
+    saveHist('mood',imgs[0].url,res.trim(),'Mood Board Blend');
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='🎨 Re-Blend';
+}
+
+// ─── Enhancer ─────────────────────────────────────────
+async function doEnhance(){
+  const inp=document.getElementById('enhIn').value.trim();
+  if(!inp){toast('Masukkan prompt dulu','er');return;}
+  const btn=document.getElementById('enhBtn');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Enhancing...';
+  try{
+    const res=await ai([{role:'user',content:`Take this basic prompt and enhance it into a professional, detailed prompt optimized for ${S.enhTarget}:
+
+INPUT: "${inp}"
+
+Make it highly detailed, specific, and optimized for ${S.enhTarget}'s style. Add: lighting details, camera angle, mood, atmosphere, technical parameters if applicable.
+Output ONLY the enhanced prompt.`}],`Expert prompt engineer for ${S.enhTarget}. Transform basic prompts into professional detailed ones.`);
+    document.getElementById('enhOut').textContent=res.trim();
+    document.getElementById('enhResult').style.display='block';
+    toast('✓ Prompt enhanced!');
+    saveHist('enhance',null,res.trim(),`Enhanced for ${S.enhTarget}`);
+  }catch(e){toast(e.message,'er');}
+  btn.disabled=false;btn.innerHTML='✨ Re-Enhance';
+}
+
+// ─── History ──────────────────────────────────────────
+function saveHist(type,thumb,prompt,label){
+  const h=JSON.parse(localStorage.getItem('hist')||'[]');
+  const icons={ref:'🖼️',product:'🔄',video:'🎬',hash:'#️⃣',mood:'🖼️',enhance:'✨'};
+  h.unshift({type,thumb,prompt,label,icon:icons[type]||'📝',time:new Date().toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'})});
+  if(h.length>20)h.pop();
+  localStorage.setItem('hist',JSON.stringify(h));
+  renderHist();
+}
+function renderHist(){
+  const h=JSON.parse(localStorage.getItem('hist')||'[]');
+  const list=document.getElementById('histlist');
+  if(!h.length){list.innerHTML='<div style="text-align:center;color:var(--mu);padding:20px;font-size:13px">Belum ada history lagi</div>';return;}
+  list.innerHTML=h.map((item,i)=>`
+    <div class="hi" onclick="loadHist(${i})">
+      ${item.thumb?`<img class="hth" src="${item.thumb}">`:`<div class="hic">${item.icon}</div>`}
+      <div class="hinfo">
+        <div class="htit">${item.icon} ${item.label} <span style="color:var(--mu);font-weight:400;font-size:10px">${item.time}</span></div>
+        <div class="hex">${item.prompt.substring(0,80)}...</div>
+      </div>
+    </div>`).join('');
+}
+function loadHist(i){const h=JSON.parse(localStorage.getItem('hist')||'[]');fbCopy(h[i].prompt,()=>toast(`✓ "${h[i].label}" copied!`));}
+function clearHist(){localStorage.removeItem('hist');renderHist();toast('History cleared');}
+</script>
+</body>
+</html>
