@@ -7,37 +7,45 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00e5ff">
 <link rel="apple-touch-icon" href="logo.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080b12;--sf:#0f1520;--sf2:#161e2e;--bd:#1e2d45;
+  --bg:#06090f;--sf:#0d1219;--sf2:#141c28;--bd:#1a2740;
   --ac:#00e5ff;--ac2:#7c3aed;--ac3:#f59e0b;
   --tx:#e8edf5;--mu:#5a7091;--ok:#10b981;--er:#ef4444;
+  --tab-h:68px;--header-h:56px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.06) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(124,58,237,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
-.w{max-width:680px;margin:0 auto;padding:0 16px 80px;position:relative;z-index:1}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--tab-h) + 16px)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.04) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(124,58,237,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+.w{max-width:680px;margin:0 auto;padding:12px 16px 24px;position:relative;z-index:1}
 
 /* Header */
-header{padding:32px 0 20px;text-align:center}
-.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--ac);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
-.badge::before{content:'';width:6px;height:6px;background:var(--ac);border-radius:50%;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--ac) 70%,var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sub{color:var(--mu);font-size:13px;margin-top:8px}
+.app-header{position:sticky;top:0;z-index:100;background:rgba(6,9,15,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.app-header img{width:30px;height:30px;border-radius:8px;object-fit:cover}
+.app-header .brand{display:flex;align-items:center;gap:10px;flex:1}
+.brand-text{display:flex;flex-direction:column}
+.app-header .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(135deg,#fff 30%,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+.app-header .brand-tag{font-size:10px;color:var(--mu);font-weight:400}
+.key-indicator{width:9px;height:9px;border-radius:50%;background:var(--er);transition:all .3s;flex-shrink:0;opacity:.7}
+.key-indicator.active{background:var(--ok);box-shadow:0 0 8px rgba(16,185,129,.5);opacity:1}
 
-/* Top bar */
-.topbar{display:flex;gap:8px;margin-bottom:14px}
-.topbar button{flex:1;padding:9px 12px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.topbar button:hover{border-color:var(--ac);color:var(--ac)}
-.topbar .danger:hover{border-color:var(--er);color:var(--er)}
+/* Bottom Tab Bar */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,15,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;height:var(--tab-h);padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
+.tab-bar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--mu);font-size:19px;cursor:pointer;transition:all .2s;padding:6px 2px;position:relative}
+.tab-bar button span{font-size:9px;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.02em}
+.tab-bar button.active{color:var(--ac)}
+.tab-bar button.active::before{content:'';position:absolute;top:0;left:25%;right:25%;height:2.5px;background:var(--ac);border-radius:0 0 3px 3px}
+
+/* Tab Panels */
+.tab-panel{display:none;animation:fadeIn .25s ease}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* Card */
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;transition:border-color .4s,box-shadow .4s;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;transition:border-color .4s,box-shadow .4s}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cc,var(--ac)),transparent);opacity:0;transition:opacity .4s}
 .card.done::before{opacity:1}
 .card.done{border-color:rgba(16,185,129,.3);--cc:var(--ok)}
@@ -54,16 +62,6 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:800;
 .br{background:rgba(0,229,255,.1);color:var(--ac);border:1px solid rgba(0,229,255,.3)}
 .bd2{background:rgba(16,185,129,.1);color:var(--ok);border:1px solid rgba(16,185,129,.3)}
 
-/* API box */
-#apib{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
-.ki{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--tx);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
-.ki:focus{border-color:var(--ac)}
-.kr{display:flex;gap:8px;align-items:center;margin-top:8px}
-.eb{padding:0;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;cursor:pointer;font-size:15px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ks{font-size:12px;margin-top:5px}
-.sr{display:flex;align-items:center;gap:7px;margin-top:6px}
-.kg{margin-top:8px;padding:10px;background:#0a0e17;border-radius:9px;font-size:12px;color:var(--mu);line-height:1.8}
-
 /* Upload */
 .ugrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ul{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
@@ -78,7 +76,6 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:800;
 .pw img{width:100%;height:100%;object-fit:cover;display:block}
 .pw .rb{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;border-radius:7px;color:#fff;font-size:11px;padding:5px 9px;cursor:pointer;min-height:30px;font-family:'DM Sans',sans-serif;transition:background .2s}
 .pw .rb:hover{background:var(--er)}
-/* Upload success flash */
 .pw.just-uploaded{animation:imgFlash .4s ease}
 @keyframes imgFlash{0%{box-shadow:0 0 0 3px var(--ok)}100%{box-shadow:none}}
 
@@ -103,7 +100,6 @@ h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:800;
 textarea,.ta{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:48px;outline:none;transition:border-color .2s;line-height:1.5;margin-top:4px}
 textarea:focus,.ta:focus{border-color:var(--ac)}
 textarea::placeholder,.ta::placeholder{color:var(--mu)}
-/* Editable prompt */
 .prompt-edit{background:var(--sf2);border:1px solid rgba(0,229,255,.3);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;min-height:120px;max-height:280px;overflow-y:auto;outline:none;margin-top:4px;transition:border-color .2s;white-space:pre-wrap;word-break:break-word}
 .prompt-edit:focus{border-color:var(--ac)}
 .prompt-edit:empty:before{content:attr(data-ph);color:var(--mu)}
@@ -148,7 +144,7 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 .rt{font-size:13px;line-height:1.7;color:var(--tx);white-space:pre-wrap;max-height:200px;overflow-y:auto}
 .rt::-webkit-scrollbar{width:3px}.rt::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
 
-/* Copy button with success state */
+/* Copy button */
 .cpb{padding:5px 11px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;color:var(--mu);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:28px;font-family:'DM Sans',sans-serif}
 .cpb:hover{border-color:var(--ac);color:var(--ac)}
 .cpb.copied{border-color:var(--ok);color:var(--ok);background:rgba(16,185,129,.1)}
@@ -166,20 +162,17 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 .lname{font-family:'Syne',sans-serif;font-weight:700;font-size:13px}
 .ldesc{font-size:11px;color:var(--mu);margin-top:2px}
 
-/* Tabs */
+/* Tabs (batch) */
 .tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .tab{padding:7px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--mu);background:var(--sf2);font-family:'Syne',sans-serif;transition:all .2s;min-height:34px}
 .tab:hover{border-color:var(--mu)}
 .tab.on{border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.1);color:var(--ac)}
 
-/* Connector */
-.conn{text-align:center;color:var(--bd);font-size:16px;padding:2px 0;margin:0 0 12px}
-
-/* Locked overlay hint */
+/* Lock hint */
 .lock-hint{text-align:center;padding:12px;color:var(--mu);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px}
 
 /* Toast */
-.toast{position:fixed;bottom:20px;right:14px;left:14px;max-width:340px;margin:0 auto;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;font-size:13px;transform:translateY(120px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:200;text-align:center}
+.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);right:14px;left:14px;max-width:340px;margin:0 auto;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;font-size:13px;transform:translateY(120px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:200;text-align:center}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{border-color:rgba(16,185,129,.4);color:var(--ok)}
 .toast.error{border-color:rgba(239,68,68,.4);color:var(--er)}
@@ -191,378 +184,430 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 .hist-time{font-size:10px;color:var(--mu);margin-bottom:4px}
 .hist-preview{font-size:12px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Scrollbar global */
+/* Scrollbar */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
 
 /* Product grid */
 #prodGrid .buz{max-height:160px}
 #prodGrid .bpw{max-height:160px}
 
-/* Ref library grid hover */
+/* Ref library */
 #refLibGrid>div:hover{border-color:var(--ac)!important;transform:scale(1.02);transition:all .2s}
+
+/* API box */
+#apib{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+.ki{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--tx);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.ki:focus{border-color:var(--ac)}
+.kr{display:flex;gap:8px;align-items:center;margin-top:8px}
+.eb{padding:0;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;cursor:pointer;font-size:15px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ks{font-size:12px;margin-top:5px}
+.sr{display:flex;align-items:center;gap:7px;margin-top:6px}
+.kg{margin-top:8px;padding:10px;background:#0a0e17;border-radius:9px;font-size:12px;color:var(--mu);line-height:1.8}
+
+/* Full package highlight */
+.full-pkg-card{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(0,229,255,.05));border:1px solid rgba(124,58,237,.3)}
+.full-pkg-card:hover{border-color:rgba(124,58,237,.5)}
+
+/* Section title in tabs */
+.section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
 </style>
 </head>
 <body>
+
+<!-- App Header -->
+<div class="app-header">
+  <div class="brand">
+    <img src="logo.png" alt="AI Creative Studio">
+    <div class="brand-text">
+      <div class="brand-name">AI Creative Studio</div>
+      <div class="brand-tag">TikTok & Shopee Affiliate</div>
+    </div>
+  </div>
+  <div class="key-indicator" id="keyDot" title="API Key Status"></div>
+</div>
+
 <div class="w">
 
-<header>
-  <div class="badge">✦ AI Creative Studio</div>
-  <h1>Analyze. Prompt. Sell.</h1>
-  <p class="sub">Upload gambar → AI generate prompt → Copy ke Google Flow / Grok / Kling</p>
-</header>
+<!-- ═══════════════ TAB: GENERATE ═══════════════ -->
+<div class="tab-panel active" id="panelGenerate">
 
-<!-- API Key -->
-<div id="apib">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-    <span style="font-size:18px">🔑</span>
-    <div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">OpenRouter API Key</div>
-      <div style="font-size:12px;color:var(--mu)">Vision + Text — 200+ models, ada FREE tier</div>
-    </div>
-  </div>
-  <div class="kr">
-    <input type="password" class="ki" id="gk" placeholder="sk-or-v1-..." oninput="ck()">
-    <button class="eb" id="eb" onclick="te()" title="Tunjuk/sembunyi key">👁️</button>
-  </div>
-  <div class="ks" id="ks" style="color:var(--mu)">Masukkan OpenRouter API key untuk mula</div>
-  <div class="sr">
-    <input type="checkbox" id="sc" onchange="sk()" style="cursor:pointer;width:16px;height:16px">
-    <label for="sc" style="font-size:12px;color:var(--mu);cursor:pointer">Simpan key dalam browser (auto-ingat)</label>
-  </div>
-  <div class="kg">
-    💡 <strong style="color:var(--tx)">Cara dapat OpenRouter API Key (FREE):</strong><br>
-    1. Pergi → <strong style="color:var(--ac)">openrouter.ai</strong> → Sign Up<br>
-    2. Klik <strong style="color:var(--tx)">Keys</strong> → Create Key<br>
-    3. Copy key (sk-or-v1-...) → Paste kat sini → tick Simpan ✓<br>
-    <span style="color:var(--ok)">✓ Free models available — vision + text (Gemini, Llama, dll)</span>
-  </div>
-</div>
-
-<!-- Top Actions -->
-<div class="topbar">
-  <button onclick="showHistory()" title="Lihat prompt history">
-    🕐 History
-  </button>
-  <button onclick="exportAll()" title="Download semua output">
-    💾 Export
-  </button>
-  <button class="danger" onclick="resetAll()" title="Reset semua">
-    ↺ Reset
-  </button>
-</div>
-
-<!-- CARD 1: Upload & Generate -->
-<div class="card" id="c1" style="--cc:var(--ac)">
-  <div class="ch">
-    <div class="cn" style="background:rgba(0,229,255,.15);color:var(--ac);border:1px solid rgba(0,229,255,.3)">1</div>
-    <div>
-      <div class="ct">Upload & Generate Prompt</div>
-      <div class="cs">AI analyze → prompt untuk Google Flow / Grok / Kling</div>
-    </div>
-    <span class="cbadge br" id="b1">Ready</span>
+  <!-- One-Click Full Package (prominent) -->
+  <div class="card full-pkg-card" style="--cc:var(--ac2);text-align:center;padding:16px 20px;margin-top:4px">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px">⚡ One-Click Full Package</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Generate SEMUA sekaligus — Prompt + Caption + Hashtag + Video</div>
+    <button class="btn" style="background:linear-gradient(135deg,var(--ac2),#9333ea);color:#fff;margin-top:0" id="fullPkgBtn" onclick="fullPackage()">🚀 Generate Full Package</button>
+    <div class="prog" id="fpProg" style="margin-top:8px"><div class="prog-bar" id="fpProgBar"></div></div>
   </div>
 
-  <div class="ugrid">
-    <div>
-      <div class="ul">🖼️ Scene Reference</div>
-      <div class="uz" id="u1" ondragover="dv(event,'u1')" ondragleave="dl('u1')" ondrop="dd(event,'ref')">
-        <input type="file" accept="image/*" onchange="fi(event,'ref')">
-        <div class="ico">🖼️</div>
-        <h3>Reference</h3>
-        <p>Model / Background</p>
-      </div>
-      <div class="pw" id="p1">
-        <img id="i1" src="" alt="ref">
-        <button class="rb" onclick="rst('ref')">✕ Reset</button>
-      </div>
-      <button class="btn btn-ghost" style="margin-top:6px;padding:8px 12px;font-size:11px" onclick="openRefLib()">📂 Library (<span id="refLibCount">0</span>)</button>
-      <button class="btn btn-ghost" id="saveRefBtn" style="margin-top:4px;padding:8px 12px;font-size:11px;display:none" onclick="saveToRefLib()">💾 Simpan ke Library</button>
-    </div>
-    <div>
-      <div class="ul">📦 Produk (1-3 gambar)</div>
-      <div id="prodGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px"></div>
-    </div>
-  </div>
-
-  <!-- Product Info Screenshot (optional) -->
-  <div style="margin-top:12px;padding:12px;background:rgba(245,158,11,.05);border:1px dashed rgba(245,158,11,.3);border-radius:14px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <span style="font-size:16px">📋</span>
+  <!-- Upload & Generate -->
+  <div class="card" id="c1" style="--cc:var(--ac)">
+    <div class="ch">
+      <div class="cn" style="background:rgba(0,229,255,.15);color:var(--ac);border:1px solid rgba(0,229,255,.3)">1</div>
       <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--ac3)">Product Info Screenshot <span style="font-size:11px;background:rgba(245,158,11,.15);color:var(--ac3);padding:2px 8px;border-radius:100px">OPTIONAL</span></div>
-        <div style="font-size:11px;color:var(--mu);margin-top:2px">Screenshot listing Shopee/website — AI baca dan extract detail kain, material, warna secara auto</div>
+        <div class="ct">Upload & Generate Prompt</div>
+        <div class="cs">AI analyze → prompt untuk Google Flow / Grok / Kling</div>
       </div>
-    </div>
-    <div id="ssZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(245,158,11,.3)" ondragover="dv(event,'ssZone')" ondragleave="dl('ssZone')" ondrop="dd(event,'ss')">
-      <input type="file" accept="image/*" onchange="fi(event,'ss')">
-      <div class="ico">📋</div>
-      <h3 style="color:var(--ac3)">Upload Screenshot</h3>
-      <p>Shopee listing / website product info</p>
-    </div>
-    <div id="ssPreview" style="display:none;margin-top:8px">
-      <img id="ssImg" src="" alt="screenshot" style="width:100%;border-radius:10px;max-height:200px;object-fit:contain;background:var(--sf2);display:block">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
-        <div style="font-size:11px;color:var(--ok)">✓ Screenshot ready — AI akan baca detail produk</div>
-        <button onclick="rst('ss')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:4px 9px;cursor:pointer">✕ Remove</button>
-      </div>
-    </div>
-  </div>
-
-  <span class="il">✍️ Detail produk tambahan (optional)</span>
-  <textarea id="pd" rows="2" placeholder="Contoh: baju kurung moden navy blue, material satin, butang emas..."></textarea>
-
-  <!-- Mode toggle -->
-  <div class="mode-row">
-    <button class="mbtn on" id="mS" onclick="setMode('single')">✦ Single</button>
-    <button class="mbtn" id="mB" onclick="setMode('batch')">⚡ Batch (5 Produk)</button>
-  </div>
-
-  <!-- Single -->
-  <div id="singleDiv">
-    <button class="btn btn-c" id="ba" onclick="an()">✨ Analyze & Generate Prompt</button>
-  </div>
-
-  <!-- Batch -->
-  <div id="batchDiv" style="display:none">
-    <span class="il" style="margin-top:10px">📦 Upload sehingga 5 gambar produk</span>
-    <div class="bgrid" id="bgrid"></div>
-    <div class="prog" id="bprog"><div class="prog-bar" id="bprogbar"></div></div>
-    <button class="btn btn-c" id="bba" onclick="batchAn()">⚡ Batch Generate Semua</button>
-  </div>
-
-  <!-- Single Result -->
-  <div id="pr" style="display:none">
-    <div class="rb2" style="border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.03)">
-      <div class="rh">
-        <span class="rl" style="color:var(--ac)">📝 Prompt + Negative — Edit jika perlu</span>
-        <button class="cpb" id="cpbMain" onclick="cpEdit('promptEdit')" style="color:var(--ac);border-color:rgba(0,229,255,.3)">Copy All</button>
-      </div>
-      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">✏️ Boleh edit terus — tap untuk tukar. Upload KEDUA gambar + paste ke tools.</div>
-      <div class="prompt-edit" id="promptEdit" contenteditable="true" data-ph="Prompt akan muncul di sini..."></div>
+      <span class="cbadge br" id="b1">Ready</span>
     </div>
 
-    <!-- Platform specs -->
-    <div style="margin-top:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">📐 Platform Image Specs</div>
-      <div class="spec-grid">
-        <div class="spec-item"><div class="spec-name" style="color:#f472b6">🛍️ Shopee</div><div class="spec-info">1:1 — 1000×1000px<br>JPG/PNG, max 2MB</div></div>
-        <div class="spec-item"><div class="spec-name" style="color:#f9a8d4">🎵 TikTok</div><div class="spec-info">9:16 — 1080×1920px<br>JPG/PNG, max 20MB</div></div>
-        <div class="spec-item"><div class="spec-name" style="color:#a78bfa">⚡ Grok Aurora</div><div class="spec-info">9:16 — 768×1024px<br>Output PNG</div></div>
-        <div class="spec-item"><div class="spec-name" style="color:var(--ac)">🎬 Google Flow</div><div class="spec-info">9:16 — 576×1024px<br>Output JPG/PNG</div></div>
-        <div class="spec-item"><div class="spec-name" style="color:#34d399">📷 Instagram</div><div class="spec-info">4:5 — 1080×1350px<br>JPG/PNG, max 8MB</div></div>
-        <div class="spec-item"><div class="spec-name" style="color:var(--ac3)">🎥 Kling AI</div><div class="spec-info">9:16 atau 1:1<br>Max 10MB per image</div></div>
-      </div>
-    </div>
-
-    <!-- Launch -->
-    <div style="margin-top:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 Buka & Auto-Copy Prompt</div>
-      <div class="launch-grid">
-        <button class="lbtn" onclick="launch('https://grok.com/image')" style="border-color:rgba(124,58,237,.3)">
-          <div class="lname" style="color:#a78bfa">⚡ Grok Web</div>
-          <div class="ldesc">Copy → buka Grok Image Gen</div>
-        </button>
-        <button class="lbtn" onclick="launch('https://labs.google/fx/tools/flow')" style="border-color:rgba(0,229,255,.3)">
-          <div class="lname" style="color:var(--ac)">🎬 Google Flow</div>
-          <div class="ldesc">Copy → buka Google Flow</div>
-        </button>
-        <button class="lbtn" onclick="launch('https://kling.ai')" style="border-color:rgba(245,158,11,.3)">
-          <div class="lname" style="color:var(--ac3)">🎥 Kling AI</div>
-          <div class="ldesc">Copy → buka Kling.ai</div>
-        </button>
-        <button class="lbtn" onclick="launch('https://www.midjourney.com')" style="border-color:rgba(52,211,153,.3)">
-          <div class="lname" style="color:#34d399">🎨 Midjourney</div>
-          <div class="ldesc">Copy → buka Midjourney</div>
-        </button>
-      </div>
-      <div style="margin-top:7px;padding:8px 11px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:9px;font-size:11px;color:var(--mu)">
-        💡 Klik button → prompt auto-copy → tab baru buka → paste + upload kedua gambar
-      </div>
-    </div>
-
-    <!-- Prompt Remix -->
-    <div style="margin-top:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--ac2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎨 Prompt Remix — Tukar Style</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        <button class="tag" onclick="remixPrompt('luxury')" style="font-size:11px">💎 Luxury</button>
-        <button class="tag" onclick="remixPrompt('minimal')" style="font-size:11px">🖤 Minimal</button>
-        <button class="tag" onclick="remixPrompt('raya')" style="font-size:11px">🌙 Raya Vibes</button>
-        <button class="tag" onclick="remixPrompt('casual')" style="font-size:11px">☀️ Casual</button>
-        <button class="tag" onclick="remixPrompt('studio')" style="font-size:11px">📸 Studio Clean</button>
-        <button class="tag" onclick="remixPrompt('outdoor')" style="font-size:11px">🌿 Outdoor</button>
-      </div>
-      <div style="font-size:10px;color:var(--mu);margin-top:5px">Tap untuk remix prompt dengan style berbeza — AI tweak tanpa regenerate dari awal</div>
-    </div>
-  </div>
-
-  <!-- Batch Result -->
-  <div id="batchResult" style="display:none;margin-top:12px">
-    <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚡ Batch Results</div>
-    <div class="tab-row" id="batchTabs"></div>
-    <div id="batchContent"></div>
-  </div>
-</div>
-
-<div class="conn">↓</div>
-
-<!-- CARD 2: Caption -->
-<div class="card" id="c2" style="--cc:#34d399">
-  <div class="ch">
-    <div class="cn" style="background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3)">2</div>
-    <div><div class="ct">Caption Generator</div><div class="cs">Shopee listing & TikTok video script</div></div>
-    <span class="cbadge bw" id="b2">Step 1 First</span>
-  </div>
-  <div id="c2lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
-  <div id="c2body" style="display:none">
-    <span class="il">📝 Jenis caption</span>
-    <div class="trow">
-      <span class="tag on" onclick="sel(this,'cap','both')">📦 Shopee + TikTok</span>
-      <span class="tag" onclick="sel(this,'cap','shopee')">🛍️ Shopee</span>
-      <span class="tag" onclick="sel(this,'cap','tiktok')">🎵 TikTok</span>
-    </div>
-    <span class="il">✍️ Info tambahan (optional)</span>
-    <textarea id="ce" rows="2" placeholder="Contoh: harga RM89, free shipping, COD, promosi raya..."></textarea>
-    <button class="btn btn-g" id="bc" onclick="genCap()">✍️ Generate Caption</button>
-    <div id="cr" style="display:none">
-      <div id="scapbox" class="rb2" style="border-color:rgba(52,211,153,.3);display:none">
-        <div class="rh"><span class="rl" style="color:#34d399">🛍️ Shopee Listing</span><button class="cpb" id="cpbShop" onclick="cpBtn('sct','cpbShop')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
-        <div class="rt" id="sct"></div>
-      </div>
-      <div id="tcapbox" class="rb2" style="border-color:rgba(52,211,153,.3);margin-top:8px;display:none">
-        <div class="rh"><span class="rl" style="color:#34d399">🎵 TikTok Script</span><button class="cpb" id="cpbTT" onclick="cpBtn('tct','cpbTT')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
-        <div class="rt" id="tct"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="conn">↓</div>
-
-<!-- CARD 3: Hashtag -->
-<div class="card" id="c3" style="--cc:#f472b6">
-  <div class="ch">
-    <div class="cn" style="background:rgba(244,114,182,.15);color:#f472b6;border:1px solid rgba(244,114,182,.3)">#</div>
-    <div><div class="ct">Hashtag Generator</div><div class="cs">Shopee & TikTok Affiliate</div></div>
-    <span class="cbadge bw" id="b3">Step 1 First</span>
-  </div>
-  <div id="c3lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
-  <div id="c3body" style="display:none">
-    <span class="il">🏷️ Platform</span>
-    <div class="trow">
-      <span class="tag on" onclick="sel(this,'ht','both')">🛒 Shopee + TikTok</span>
-      <span class="tag" onclick="sel(this,'ht','shopee')">🛍️ Shopee</span>
-      <span class="tag" onclick="sel(this,'ht','tiktok')">🎵 TikTok</span>
-    </div>
-    <span class="il">✍️ Info tambahan (optional)</span>
-    <textarea id="he" rows="2" placeholder="Contoh: harga RM89, COD available, free gift..."></textarea>
-    <button class="btn btn-p" id="bh" onclick="gh()"># Generate Hashtags</button>
-    <div id="hr" style="display:none">
-      <div id="sb" class="rb2" style="border-color:rgba(244,114,182,.3);display:none">
-        <div class="rh"><span class="rl">🛍️ Shopee</span><button class="cpb" id="cpbSH" onclick="cpBtn('st','cpbSH')">Copy</button></div>
-        <div class="rt" id="st"></div>
-      </div>
-      <div id="tb" class="rb2" style="border-color:rgba(244,114,182,.3);margin-top:8px;display:none">
-        <div class="rh"><span class="rl">🎵 TikTok</span><button class="cpb" id="cpbTH" onclick="cpBtn('tt','cpbTH')">Copy</button></div>
-        <div class="rt" id="tt"></div>
-      </div>
-      <div class="rb2" style="margin-top:8px;background:rgba(244,114,182,.04);border-color:rgba(244,114,182,.2)">
-        <div class="rl" style="color:#f472b6;margin-bottom:7px">💡 Tips</div>
-        <div class="rt" id="ht2" style="color:var(--mu);font-size:13px"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="conn">↓</div>
-
-<!-- CARD 4: Video Prompt -->
-<div class="card" id="c4" style="--cc:var(--ac3)">
-  <div class="ch">
-    <div class="cn" style="background:rgba(245,158,11,.15);color:var(--ac3);border:1px solid rgba(245,158,11,.3)">4</div>
-    <div><div class="ct">Video AI Prompt</div><div class="cs">Grok Aurora & Google Flow</div></div>
-    <span class="cbadge bw" id="b4">Step 1 First</span>
-  </div>
-  <div id="c4lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
-  <div id="c4body" style="display:none">
-    <span class="il">🎬 Platform</span>
-    <div class="trow">
-      <span class="tag on" onclick="sel(this,'pl','Grok Aurora 6s')">⚡ Grok 6s</span>
-      <span class="tag" onclick="sel(this,'pl','Grok Aurora 10s')">⚡ Grok 10s</span>
-      <span class="tag" onclick="sel(this,'pl','Google Flow 8s')">🎬 Google Flow</span>
-    </div>
-    <span class="il">✍️ Arahan video (optional)</span>
-    <textarea id="ve" rows="2" placeholder="Contoh: slow zoom in, model pusing, produk berkilat..."></textarea>
-    <button class="btn btn-a" id="bv" onclick="gv()">🎬 Generate Video Prompt</button>
-    <div id="vr" style="display:none">
-      <div class="rb2" style="border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05)">
-        <div class="rh">
-          <span class="rl" style="color:#a78bfa">🎬 <span id="vpl"></span> — Full Prompt</span>
-          <button class="cpb" id="cpbVP" onclick="cpBtn('vp','cpbVP')" style="color:#a78bfa;border-color:rgba(124,58,237,.3)">Copy All</button>
+    <div class="ugrid">
+      <div>
+        <div class="ul">🖼️ Scene Reference</div>
+        <div class="uz" id="u1" ondragover="dv(event,'u1')" ondragleave="dl('u1')" ondrop="dd(event,'ref')">
+          <input type="file" accept="image/*" onchange="fi(event,'ref')">
+          <div class="ico">🖼️</div>
+          <h3>Reference</h3>
+          <p>Model / Background</p>
         </div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Prompt + Negative + Camera dalam satu box — copy terus paste ke tools</div>
-        <div class="rt" id="vp"></div>
+        <div class="pw" id="p1">
+          <img id="i1" src="" alt="ref">
+          <button class="rb" onclick="rst('ref')">✕ Reset</button>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:6px;padding:8px 12px;font-size:11px" onclick="openRefLib()">📂 Library (<span id="refLibCount">0</span>)</button>
+        <button class="btn btn-ghost" id="saveRefBtn" style="margin-top:4px;padding:8px 12px;font-size:11px;display:none" onclick="saveToRefLib()">💾 Simpan ke Library</button>
+      </div>
+      <div>
+        <div class="ul">📦 Produk (1-3 gambar)</div>
+        <div id="prodGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px"></div>
+      </div>
+    </div>
+
+    <!-- Product Info Screenshot (optional) -->
+    <div style="margin-top:12px;padding:12px;background:rgba(245,158,11,.05);border:1px dashed rgba(245,158,11,.3);border-radius:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:16px">📋</span>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--ac3)">Product Info Screenshot <span style="font-size:11px;background:rgba(245,158,11,.15);color:var(--ac3);padding:2px 8px;border-radius:100px">OPTIONAL</span></div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">Screenshot listing Shopee/website — AI baca dan extract detail kain, material, warna secara auto</div>
+        </div>
+      </div>
+      <div id="ssZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(245,158,11,.3)" ondragover="dv(event,'ssZone')" ondragleave="dl('ssZone')" ondrop="dd(event,'ss')">
+        <input type="file" accept="image/*" onchange="fi(event,'ss')">
+        <div class="ico">📋</div>
+        <h3 style="color:var(--ac3)">Upload Screenshot</h3>
+        <p>Shopee listing / website product info</p>
+      </div>
+      <div id="ssPreview" style="display:none;margin-top:8px">
+        <img id="ssImg" src="" alt="screenshot" style="width:100%;border-radius:10px;max-height:200px;object-fit:contain;background:var(--sf2);display:block">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <div style="font-size:11px;color:var(--ok)">✓ Screenshot ready — AI akan baca detail produk</div>
+          <button onclick="rst('ss')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:4px 9px;cursor:pointer">✕ Remove</button>
+        </div>
+      </div>
+    </div>
+
+    <span class="il">✍️ Detail produk tambahan (optional)</span>
+    <textarea id="pd" rows="2" placeholder="Contoh: baju kurung moden navy blue, material satin, butang emas..."></textarea>
+
+    <!-- Mode toggle -->
+    <div class="mode-row">
+      <button class="mbtn on" id="mS" onclick="setMode('single')">✦ Single</button>
+      <button class="mbtn" id="mB" onclick="setMode('batch')">⚡ Batch (5 Produk)</button>
+    </div>
+
+    <!-- Single -->
+    <div id="singleDiv">
+      <button class="btn btn-c" id="ba" onclick="an()">✨ Analyze & Generate Prompt</button>
+    </div>
+
+    <!-- Batch -->
+    <div id="batchDiv" style="display:none">
+      <span class="il" style="margin-top:10px">📦 Upload sehingga 5 gambar produk</span>
+      <div class="bgrid" id="bgrid"></div>
+      <div class="prog" id="bprog"><div class="prog-bar" id="bprogbar"></div></div>
+      <button class="btn btn-c" id="bba" onclick="batchAn()">⚡ Batch Generate Semua</button>
+    </div>
+
+    <!-- Single Result -->
+    <div id="pr" style="display:none">
+      <div class="rb2" style="border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.03)">
+        <div class="rh">
+          <span class="rl" style="color:var(--ac)">📝 Prompt + Negative — Edit jika perlu</span>
+          <button class="cpb" id="cpbMain" onclick="cpEdit('promptEdit')" style="color:var(--ac);border-color:rgba(0,229,255,.3)">Copy All</button>
+        </div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">✏️ Boleh edit terus — tap untuk tukar. Upload KEDUA gambar + paste ke tools.</div>
+        <div class="prompt-edit" id="promptEdit" contenteditable="true" data-ph="Prompt akan muncul di sini..."></div>
+      </div>
+
+      <!-- Platform specs -->
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">📐 Platform Image Specs</div>
+        <div class="spec-grid">
+          <div class="spec-item"><div class="spec-name" style="color:#f472b6">🛍️ Shopee</div><div class="spec-info">1:1 — 1000×1000px<br>JPG/PNG, max 2MB</div></div>
+          <div class="spec-item"><div class="spec-name" style="color:#f9a8d4">🎵 TikTok</div><div class="spec-info">9:16 — 1080×1920px<br>JPG/PNG, max 20MB</div></div>
+          <div class="spec-item"><div class="spec-name" style="color:#a78bfa">⚡ Grok Aurora</div><div class="spec-info">9:16 — 768×1024px<br>Output PNG</div></div>
+          <div class="spec-item"><div class="spec-name" style="color:var(--ac)">🎬 Google Flow</div><div class="spec-info">9:16 — 576×1024px<br>Output JPG/PNG</div></div>
+          <div class="spec-item"><div class="spec-name" style="color:#34d399">📷 Instagram</div><div class="spec-info">4:5 — 1080×1350px<br>JPG/PNG, max 8MB</div></div>
+          <div class="spec-item"><div class="spec-name" style="color:var(--ac3)">🎥 Kling AI</div><div class="spec-info">9:16 atau 1:1<br>Max 10MB per image</div></div>
+        </div>
+      </div>
+
+      <!-- Launch -->
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 Buka & Auto-Copy Prompt</div>
+        <div class="launch-grid">
+          <button class="lbtn" onclick="launch('https://grok.com/image')" style="border-color:rgba(124,58,237,.3)">
+            <div class="lname" style="color:#a78bfa">⚡ Grok Web</div>
+            <div class="ldesc">Copy → buka Grok Image Gen</div>
+          </button>
+          <button class="lbtn" onclick="launch('https://labs.google/fx/tools/flow')" style="border-color:rgba(0,229,255,.3)">
+            <div class="lname" style="color:var(--ac)">🎬 Google Flow</div>
+            <div class="ldesc">Copy → buka Google Flow</div>
+          </button>
+          <button class="lbtn" onclick="launch('https://kling.ai')" style="border-color:rgba(245,158,11,.3)">
+            <div class="lname" style="color:var(--ac3)">🎥 Kling AI</div>
+            <div class="ldesc">Copy → buka Kling.ai</div>
+          </button>
+          <button class="lbtn" onclick="launch('https://www.midjourney.com')" style="border-color:rgba(52,211,153,.3)">
+            <div class="lname" style="color:#34d399">🎨 Midjourney</div>
+            <div class="ldesc">Copy → buka Midjourney</div>
+          </button>
+        </div>
+        <div style="margin-top:7px;padding:8px 11px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:9px;font-size:11px;color:var(--mu)">
+          💡 Klik button → prompt auto-copy → tab baru buka → paste + upload kedua gambar
+        </div>
+      </div>
+
+      <!-- Prompt Remix -->
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--ac2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎨 Prompt Remix — Tukar Style</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="tag" onclick="remixPrompt('luxury')" style="font-size:11px">💎 Luxury</button>
+          <button class="tag" onclick="remixPrompt('minimal')" style="font-size:11px">🖤 Minimal</button>
+          <button class="tag" onclick="remixPrompt('raya')" style="font-size:11px">🌙 Raya Vibes</button>
+          <button class="tag" onclick="remixPrompt('casual')" style="font-size:11px">☀️ Casual</button>
+          <button class="tag" onclick="remixPrompt('studio')" style="font-size:11px">📸 Studio Clean</button>
+          <button class="tag" onclick="remixPrompt('outdoor')" style="font-size:11px">🌿 Outdoor</button>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-top:5px">Tap untuk remix prompt dengan style berbeza — AI tweak tanpa regenerate dari awal</div>
+      </div>
+    </div>
+
+    <!-- Batch Result -->
+    <div id="batchResult" style="display:none;margin-top:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚡ Batch Results</div>
+      <div class="tab-row" id="batchTabs"></div>
+      <div id="batchContent"></div>
+    </div>
+  </div>
+</div><!-- end panelGenerate -->
+
+<!-- ═══════════════ TAB: CONTENT ═══════════════ -->
+<div class="tab-panel" id="panelContent">
+
+  <!-- Caption Generator -->
+  <div class="card" id="c2" style="--cc:#34d399">
+    <div class="ch">
+      <div class="cn" style="background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3)">✍️</div>
+      <div><div class="ct">Caption Generator</div><div class="cs">Shopee listing & TikTok video script</div></div>
+      <span class="cbadge bw" id="b2">Step 1 First</span>
+    </div>
+    <div id="c2lock" class="lock-hint">🔒 Generate prompt dulu di tab Generate</div>
+    <div id="c2body" style="display:none">
+      <span class="il">📝 Jenis caption</span>
+      <div class="trow">
+        <span class="tag on" onclick="sel(this,'cap','both')">📦 Shopee + TikTok</span>
+        <span class="tag" onclick="sel(this,'cap','shopee')">🛍️ Shopee</span>
+        <span class="tag" onclick="sel(this,'cap','tiktok')">🎵 TikTok</span>
+      </div>
+      <span class="il">✍️ Info tambahan (optional)</span>
+      <textarea id="ce" rows="2" placeholder="Contoh: harga RM89, free shipping, COD, promosi raya..."></textarea>
+      <button class="btn btn-g" id="bc" onclick="genCap()">✍️ Generate Caption</button>
+      <div id="cr" style="display:none">
+        <div id="scapbox" class="rb2" style="border-color:rgba(52,211,153,.3);display:none">
+          <div class="rh"><span class="rl" style="color:#34d399">🛍️ Shopee Listing</span><button class="cpb" id="cpbShop" onclick="cpBtn('sct','cpbShop')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
+          <div class="rt" id="sct"></div>
+        </div>
+        <div id="tcapbox" class="rb2" style="border-color:rgba(52,211,153,.3);margin-top:8px;display:none">
+          <div class="rh"><span class="rl" style="color:#34d399">🎵 TikTok Script</span><button class="cpb" id="cpbTT" onclick="cpBtn('tct','cpbTT')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
+          <div class="rt" id="tct"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="conn">↓</div>
-
-<!-- CARD 5: Competitor Spy -->
-<div class="card" id="c5" style="--cc:#ef4444">
-  <div class="ch">
-    <div class="cn" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)">🕵️</div>
-    <div><div class="ct">Competitor Spy Mode</div><div class="cs">Screenshot competitor → AI reverse-engineer prompt</div></div>
-    <span class="cbadge br" id="b5">Ready</span>
-  </div>
-  <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Upload screenshot/gambar dari TikTok/Shopee competitor — AI akan analyze dan generate prompt yang sama atau lebih baik.</div>
-  <div id="spyZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(239,68,68,.3)" ondragover="dv(event,'spyZone')" ondragleave="dl('spyZone')" ondrop="dd(event,'spy')">
-    <input type="file" accept="image/*" onchange="fi(event,'spy')">
-    <div class="ico">🕵️</div>
-    <h3 style="color:#ef4444">Upload Competitor Image/SS</h3>
-    <p>TikTok video SS / Shopee listing / IG post</p>
-  </div>
-  <div id="spyPreview" style="display:none;margin-top:8px">
-    <img id="spyImg" src="" alt="spy" style="width:100%;border-radius:10px;max-height:240px;object-fit:contain;background:var(--sf2);display:block">
-    <button onclick="rst('spy')" style="margin-top:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:5px 10px;cursor:pointer">✕ Remove</button>
-  </div>
-  <span class="il">🎯 Apa yang kau nak (optional)</span>
-  <textarea id="spyExtra" rows="2" placeholder="Contoh: aku nak sama tapi lebih luxury / aku nak style lighting dia je / aku nak pose macam tu..."></textarea>
-  <div class="trow" style="margin-top:8px">
-    <span class="tag on" onclick="sel(this,'spyMode','replicate')">🎯 Replicate Style</span>
-    <span class="tag" onclick="sel(this,'spyMode','better')">⚡ Buat Lebih Baik</span>
-    <span class="tag" onclick="sel(this,'spyMode','analyze')">🔍 Analyze Sahaja</span>
-  </div>
-  <button class="btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff" id="spyBtn" onclick="spyAnalyze()">🕵️ Spy & Generate Prompt</button>
-  <div id="spyResult" style="display:none">
-    <div class="rb2" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.03)">
-      <div class="rh">
-        <span class="rl" style="color:#ef4444">🕵️ Competitor Analysis + Prompt</span>
-        <button class="cpb" id="cpbSpy" onclick="cpBtn('spyText','cpbSpy')" style="color:#ef4444;border-color:rgba(239,68,68,.3)">Copy</button>
+  <!-- Hashtag Generator -->
+  <div class="card" id="c3" style="--cc:#f472b6">
+    <div class="ch">
+      <div class="cn" style="background:rgba(244,114,182,.15);color:#f472b6;border:1px solid rgba(244,114,182,.3)">#</div>
+      <div><div class="ct">Hashtag Generator</div><div class="cs">Shopee & TikTok Affiliate</div></div>
+      <span class="cbadge bw" id="b3">Step 1 First</span>
+    </div>
+    <div id="c3lock" class="lock-hint">🔒 Generate prompt dulu di tab Generate</div>
+    <div id="c3body" style="display:none">
+      <span class="il">🏷️ Platform</span>
+      <div class="trow">
+        <span class="tag on" onclick="sel(this,'ht','both')">🛒 Shopee + TikTok</span>
+        <span class="tag" onclick="sel(this,'ht','shopee')">🛍️ Shopee</span>
+        <span class="tag" onclick="sel(this,'ht','tiktok')">🎵 TikTok</span>
       </div>
-      <div class="rt" id="spyText"></div>
+      <span class="il">✍️ Info tambahan (optional)</span>
+      <textarea id="he" rows="2" placeholder="Contoh: harga RM89, COD available, free gift..."></textarea>
+      <button class="btn btn-p" id="bh" onclick="gh()"># Generate Hashtags</button>
+      <div id="hr" style="display:none">
+        <div id="sb" class="rb2" style="border-color:rgba(244,114,182,.3);display:none">
+          <div class="rh"><span class="rl">🛍️ Shopee</span><button class="cpb" id="cpbSH" onclick="cpBtn('st','cpbSH')">Copy</button></div>
+          <div class="rt" id="st"></div>
+        </div>
+        <div id="tb" class="rb2" style="border-color:rgba(244,114,182,.3);margin-top:8px;display:none">
+          <div class="rh"><span class="rl">🎵 TikTok</span><button class="cpb" id="cpbTH" onclick="cpBtn('tt','cpbTH')">Copy</button></div>
+          <div class="rt" id="tt"></div>
+        </div>
+        <div class="rb2" style="margin-top:8px;background:rgba(244,114,182,.04);border-color:rgba(244,114,182,.2)">
+          <div class="rl" style="color:#f472b6;margin-bottom:7px">💡 Tips</div>
+          <div class="rt" id="ht2" style="color:var(--mu);font-size:13px"></div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</div><!-- end panelContent -->
 
-<div class="conn">↓</div>
+<!-- ═══════════════ TAB: VIDEO ═══════════════ -->
+<div class="tab-panel" id="panelVideo">
+  <div class="card" id="c4" style="--cc:var(--ac3)">
+    <div class="ch">
+      <div class="cn" style="background:rgba(245,158,11,.15);color:var(--ac3);border:1px solid rgba(245,158,11,.3)">🎬</div>
+      <div><div class="ct">Video AI Prompt</div><div class="cs">Grok Aurora & Google Flow</div></div>
+      <span class="cbadge bw" id="b4">Step 1 First</span>
+    </div>
+    <div id="c4lock" class="lock-hint">🔒 Generate prompt dulu di tab Generate</div>
+    <div id="c4body" style="display:none">
+      <span class="il">🎬 Platform</span>
+      <div class="trow">
+        <span class="tag on" onclick="sel(this,'pl','Grok Aurora 6s')">⚡ Grok 6s</span>
+        <span class="tag" onclick="sel(this,'pl','Grok Aurora 10s')">⚡ Grok 10s</span>
+        <span class="tag" onclick="sel(this,'pl','Google Flow 8s')">🎬 Google Flow</span>
+      </div>
+      <span class="il">✍️ Arahan video (optional)</span>
+      <textarea id="ve" rows="2" placeholder="Contoh: slow zoom in, model pusing, produk berkilat..."></textarea>
+      <button class="btn btn-a" id="bv" onclick="gv()">🎬 Generate Video Prompt</button>
+      <div id="vr" style="display:none">
+        <div class="rb2" style="border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05)">
+          <div class="rh">
+            <span class="rl" style="color:#a78bfa">🎬 <span id="vpl"></span> — Full Prompt</span>
+            <button class="cpb" id="cpbVP" onclick="cpBtn('vp','cpbVP')" style="color:#a78bfa;border-color:rgba(124,58,237,.3)">Copy All</button>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Prompt + Negative + Camera dalam satu box — copy terus paste ke tools</div>
+          <div class="rt" id="vp"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- end panelVideo -->
 
-<!-- One-Click Full Package -->
-<div class="card" style="--cc:var(--ac2);text-align:center;padding:16px 20px">
-  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">⚡ One-Click Full Package</div>
-  <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Generate SEMUA sekaligus — Prompt + Caption + Hashtag + Video Prompt</div>
-  <button class="btn" style="background:linear-gradient(135deg,var(--ac2),#9333ea);color:#fff;margin-top:0" id="fullPkgBtn" onclick="fullPackage()">🚀 Generate Full Package</button>
-  <div class="prog" id="fpProg" style="margin-top:8px"><div class="prog-bar" id="fpProgBar"></div></div>
-</div>
+<!-- ═══════════════ TAB: SPY ═══════════════ -->
+<div class="tab-panel" id="panelSpy">
+  <div class="card" id="c5" style="--cc:#ef4444">
+    <div class="ch">
+      <div class="cn" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)">🕵️</div>
+      <div><div class="ct">Competitor Spy Mode</div><div class="cs">Screenshot competitor → AI reverse-engineer prompt</div></div>
+      <span class="cbadge br" id="b5">Ready</span>
+    </div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Upload screenshot/gambar dari TikTok/Shopee competitor — AI akan analyze dan generate prompt yang sama atau lebih baik.</div>
+    <div id="spyZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(239,68,68,.3)" ondragover="dv(event,'spyZone')" ondragleave="dl('spyZone')" ondrop="dd(event,'spy')">
+      <input type="file" accept="image/*" onchange="fi(event,'spy')">
+      <div class="ico">🕵️</div>
+      <h3 style="color:#ef4444">Upload Competitor Image/SS</h3>
+      <p>TikTok video SS / Shopee listing / IG post</p>
+    </div>
+    <div id="spyPreview" style="display:none;margin-top:8px">
+      <img id="spyImg" src="" alt="spy" style="width:100%;border-radius:10px;max-height:240px;object-fit:contain;background:var(--sf2);display:block">
+      <button onclick="rst('spy')" style="margin-top:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:5px 10px;cursor:pointer">✕ Remove</button>
+    </div>
+    <span class="il">🎯 Apa yang kau nak (optional)</span>
+    <textarea id="spyExtra" rows="2" placeholder="Contoh: aku nak sama tapi lebih luxury / aku nak style lighting dia je / aku nak pose macam tu..."></textarea>
+    <div class="trow" style="margin-top:8px">
+      <span class="tag on" onclick="sel(this,'spyMode','replicate')">🎯 Replicate Style</span>
+      <span class="tag" onclick="sel(this,'spyMode','better')">⚡ Buat Lebih Baik</span>
+      <span class="tag" onclick="sel(this,'spyMode','analyze')">🔍 Analyze Sahaja</span>
+    </div>
+    <button class="btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff" id="spyBtn" onclick="spyAnalyze()">🕵️ Spy & Generate Prompt</button>
+    <div id="spyResult" style="display:none">
+      <div class="rb2" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.03)">
+        <div class="rh">
+          <span class="rl" style="color:#ef4444">🕵️ Competitor Analysis + Prompt</span>
+          <button class="cpb" id="cpbSpy" onclick="cpBtn('spyText','cpbSpy')" style="color:#ef4444;border-color:rgba(239,68,68,.3)">Copy</button>
+        </div>
+        <div class="rt" id="spyText"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- end panelSpy -->
 
-<div class="conn">↓</div>
+<!-- ═══════════════ TAB: SETTINGS ═══════════════ -->
+<div class="tab-panel" id="panelSettings">
 
-<!-- Export All -->
-<div class="card" style="--cc:#34d399;text-align:center;padding:16px 20px">
-  <button class="btn btn-export" style="margin-top:0" onclick="exportAll()">
-    💾 Download Semua Output (.txt)
+  <!-- API Key -->
+  <div id="apib">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <span style="font-size:18px">🔑</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">OpenRouter API Key</div>
+        <div style="font-size:12px;color:var(--mu)">Vision + Text — 200+ models, ada FREE tier</div>
+      </div>
+    </div>
+    <div class="kr">
+      <input type="password" class="ki" id="gk" placeholder="sk-or-v1-..." oninput="ck()">
+      <button class="eb" id="eb" onclick="te()" title="Tunjuk/sembunyi key">👁️</button>
+    </div>
+    <div class="ks" id="ks" style="color:var(--mu)">Masukkan OpenRouter API key untuk mula</div>
+    <div class="sr">
+      <input type="checkbox" id="sc" onchange="sk()" style="cursor:pointer;width:16px;height:16px">
+      <label for="sc" style="font-size:12px;color:var(--mu);cursor:pointer">Simpan key dalam browser (auto-ingat)</label>
+    </div>
+    <div class="kg">
+      💡 <strong style="color:var(--tx)">Cara dapat OpenRouter API Key (FREE):</strong><br>
+      1. Pergi → <strong style="color:var(--ac)">openrouter.ai</strong> → Sign Up<br>
+      2. Klik <strong style="color:var(--tx)">Keys</strong> → Create Key<br>
+      3. Copy key (sk-or-v1-...) → Paste kat sini → tick Simpan ✓<br>
+      <span style="color:var(--ok)">✓ Free models available — vision + text (Gemini, Llama, dll)</span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="section-title">Actions</div>
+  <div class="card" style="padding:14px 16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn btn-ghost" style="margin:0;padding:10px" onclick="showHistory()">🕐 History</button>
+      <button class="btn btn-export" style="margin:0;padding:10px" onclick="exportAll()">💾 Export All</button>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:8px;padding:10px;color:var(--er);border-color:rgba(239,68,68,.3)" onclick="resetAll()">↺ Reset Semua</button>
+  </div>
+
+  <!-- App Info -->
+  <div class="card" style="padding:14px 16px;text-align:center">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px">AI Creative Studio</div>
+    <div style="font-size:11px;color:var(--mu)">TikTok & Shopee Affiliate Tool</div>
+    <div style="font-size:10px;color:var(--mu);margin-top:6px">Upload gambar → AI generate prompt → Copy ke Google Flow / Grok / Kling</div>
+  </div>
+</div><!-- end panelSettings -->
+
+</div><!-- end .w -->
+
+<!-- Bottom Tab Bar -->
+<nav class="tab-bar">
+  <button class="active" onclick="switchTab('Generate')" id="tabGenerate">
+    <span style="font-size:19px">🎨</span>
+    <span>Generate</span>
   </button>
-</div>
+  <button onclick="switchTab('Content')" id="tabContent">
+    <span style="font-size:19px">✍️</span>
+    <span>Content</span>
+  </button>
+  <button onclick="switchTab('Video')" id="tabVideo">
+    <span style="font-size:19px">🎬</span>
+    <span>Video</span>
+  </button>
+  <button onclick="switchTab('Spy')" id="tabSpy">
+    <span style="font-size:19px">🕵️</span>
+    <span>Spy</span>
+  </button>
+  <button onclick="switchTab('Settings')" id="tabSettings">
+    <span style="font-size:19px">⚙️</span>
+    <span>Settings</span>
+  </button>
+</nav>
 
 <!-- History Modal -->
 <div id="histModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;padding:20px;overflow-y:auto">
@@ -588,10 +633,24 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
   </div>
 </div>
 
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── Tab Navigation ───────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-bar button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel'+name).classList.add('active');
+  document.getElementById('tab'+name).classList.add('active');
+}
+
+// ─── Key Indicator ────────────────────────────────────
+function updateKeyIndicator(){
+  const k=(document.getElementById('gk')?.value||'').trim();
+  const dot=document.getElementById('keyDot');
+  if(dot)dot.classList.toggle('active',k.startsWith('sk-or-'));
+}
+
 // ─── State ────────────────────────────────────────────
 const S={
   ref:null, refMime:'image/jpeg',
@@ -627,6 +686,7 @@ function ck(){
   if(!k){s.textContent='Masukkan OpenRouter API key untuk mula';s.style.color='var(--mu)';i.style.borderColor='var(--bd)'}
   else if(!k.startsWith('sk-or-')){s.textContent='⚠️ Format salah — mesti bermula sk-or-...';s.style.color='var(--ac3)';i.style.borderColor='var(--ac3)'}
   else{s.textContent='✓ OpenRouter API key sedia digunakan';s.style.color='var(--ok)';i.style.borderColor='var(--ok)'}
+  updateKeyIndicator();
 }
 function sk(){
   const c=document.getElementById('sc'), k=document.getElementById('gk').value.trim();
@@ -848,7 +908,7 @@ function deleteRefFromLib(i){
   lib.splice(i,1);
   saveRefLib(lib);
   updateRefLibCount();
-  openRefLib(); // refresh grid
+  openRefLib();
   toast('✓ Reference deleted','info');
 }
 
@@ -883,7 +943,7 @@ async function groq(msgs, sys, vis=false){
   let lastErr='';
   for(let i=0;i<models.length;i++){
     const model=models[i];
-    if(i>0)await sleep(1500); // delay 1.5s antara retry untuk elak rate limit
+    if(i>0)await sleep(1500);
     try{
       const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',
@@ -943,20 +1003,14 @@ NEGATIVE:
 }
 
 function parsePromptResult(result){
-  // Clean up quotes and extra whitespace
   let clean=result.replace(/^["']+|["']+$/gm,'').trim();
-  // Extract main prompt (before NEGATIVE:)
   let main=(clean.match(/PROMPT:\s*\n?([\s\S]*?)(?=\n\s*NEGATIVE:|\n\s*--no\s|$)/i)?.[1]||clean).trim();
-  // Remove any "NEGATIVE:" or "--no" that leaked into main
   main=main.replace(/\s*NEGATIVE:\s*["']?[\s\S]*$/i,'').trim();
   main=main.replace(/\s*--no\s+["']?[\s\S]*$/i,'').trim();
-  // Remove wrapping quotes from main
   main=main.replace(/^["']|["']$/g,'').trim();
-  // Extract negative
   let neg=(clean.match(/NEGATIVE:\s*\n?\s*["']?([\s\S]*?)["']?\s*$/i)?.[1]||'').trim();
   if(!neg)neg=(clean.match(/--no\s+["']?([\s\S]*?)["']?\s*$/i)?.[1]||'').trim();
   if(!neg)neg='blurry, low quality, distorted, deformed hands, bad anatomy, watermark, logo, low resolution';
-  // Clean neg from duplicate --no prefix
   neg=neg.replace(/^--no\s+/i,'').replace(/^["']|["']$/g,'').trim();
   return main+'\n\n--no '+neg;
 }
@@ -1011,6 +1065,7 @@ function loadHistory(i){
     S.ana=h.prompt;
     document.getElementById('pr').style.display='block';
     closeHistory();
+    switchTab('Generate');
     toast('✓ Prompt loaded dari history');
   }catch(e){}
 }
@@ -1256,7 +1311,6 @@ async function gv(){
     const res=await groq([{role:'user',content:`SCENE CONTEXT:\n${S.ana}\n\n${pg}\n${ex?'USER INSTRUCTION: '+ex+'\n':''}\nGenerate a complete video prompt in ENGLISH ONLY. Combine everything into ONE block in this exact format:\n\nVIDEO PROMPT: [main cinematic prompt in English]\n\n--no [negative terms in English]\n\nCAMERA: [camera type, motion speed, duration notes in English]\n\nIMPORTANT: Everything must be in English. No Bahasa Malaysia.`}],
       `Expert video AI prompt engineer for ${S.pl}. Generate cinematic English prompts only. Combine prompt, negative, and camera into one formatted block.`);
 
-    // Combine all into one clean block
     const vidP=(res.match(/VIDEO PROMPT:\s*([\s\S]*?)(?=\n--no|\nCAMERA:|$)/)?.[1]||res).trim();
     const neg=(res.match(/--no\s*([\s\S]*?)(?=\nCAMERA:|$)/)?.[1]||'blurry, low quality, distorted, deformed hands, bad anatomy, watermark').trim();
     const cam=(res.match(/CAMERA:\s*([\s\S]*?)$/)?.[1]||'Smooth cinematic motion, 24fps, 9:16 vertical').trim();
@@ -1404,8 +1458,8 @@ async function fullPackage(){
     // Step 1: Generate image prompt
     updateProg();
     if(!S.ana||!S.done){
-      await an(); // this sets S.ana and unlocks cards
-      await sleep(2000); // wait for rate limit
+      await an();
+      await sleep(2000);
     }
     if(!S.ana){throw new Error('Image prompt gagal');}
 
@@ -1442,6 +1496,7 @@ window.addEventListener('load',()=>{
   renderBatchGrid();
   renderProdGrid();
   updateRefLibCount();
+  updateKeyIndicator();
   // Close modals on backdrop click
   document.getElementById('histModal').addEventListener('click',function(e){
     if(e.target===this)closeHistory();
