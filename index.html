@@ -748,8 +748,21 @@ NEGATIVE:
 }
 
 function parsePromptResult(result){
-  const main=(result.match(/PROMPT:\n?([\s\S]*?)(?=\nNEGATIVE:|$)/)?.[1]||result).trim();
-  const neg=(result.match(/NEGATIVE:\n?([\s\S]*?)$/)?.[1]||'blurry, low quality, distorted, deformed hands, bad anatomy, watermark').trim();
+  // Clean up quotes and extra whitespace
+  let clean=result.replace(/^["']+|["']+$/gm,'').trim();
+  // Extract main prompt (before NEGATIVE:)
+  let main=(clean.match(/PROMPT:\s*\n?([\s\S]*?)(?=\n\s*NEGATIVE:|\n\s*--no\s|$)/i)?.[1]||clean).trim();
+  // Remove any "NEGATIVE:" or "--no" that leaked into main
+  main=main.replace(/\s*NEGATIVE:\s*["']?[\s\S]*$/i,'').trim();
+  main=main.replace(/\s*--no\s+["']?[\s\S]*$/i,'').trim();
+  // Remove wrapping quotes from main
+  main=main.replace(/^["']|["']$/g,'').trim();
+  // Extract negative
+  let neg=(clean.match(/NEGATIVE:\s*\n?\s*["']?([\s\S]*?)["']?\s*$/i)?.[1]||'').trim();
+  if(!neg)neg=(clean.match(/--no\s+["']?([\s\S]*?)["']?\s*$/i)?.[1]||'').trim();
+  if(!neg)neg='blurry, low quality, distorted, deformed hands, bad anatomy, watermark, logo, low resolution';
+  // Clean neg from duplicate --no prefix
+  neg=neg.replace(/^--no\s+/i,'').replace(/^["']|["']$/g,'').trim();
   return main+'\n\n--no '+neg;
 }
 
