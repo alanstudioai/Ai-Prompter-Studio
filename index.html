@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Creative Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080b12;--sf:#0f1520;--sf2:#161e2e;--bd:#1e2d45;
+  --ac:#00e5ff;--ac2:#7c3aed;--ac3:#f59e0b;
+  --tx:#e8edf5;--mu:#5a7091;--ok:#10b981;--er:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(0,229,255,.06) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(124,58,237,.07) 0%,transparent 60%);pointer-events:none;z-index:0}
+.w{max-width:680px;margin:0 auto;padding:0 16px 80px;position:relative;z-index:1}
+
+/* Header */
+header{padding:32px 0 20px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--ac);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.badge::before{content:'';width:6px;height:6px;background:var(--ac);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+h1{font-family:'Syne',sans-serif;font-size:clamp(24px,5vw,40px);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 30%,var(--ac) 70%,var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--mu);font-size:13px;margin-top:8px}
+
+/* Top bar */
+.topbar{display:flex;gap:8px;margin-bottom:14px}
+.topbar button{flex:1;padding:9px 12px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.topbar button:hover{border-color:var(--ac);color:var(--ac)}
+.topbar .danger:hover{border-color:var(--er);color:var(--er)}
+
+/* Card */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;transition:border-color .4s,box-shadow .4s;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cc,var(--ac)),transparent);opacity:0;transition:opacity .4s}
+.card.done::before{opacity:1}
+.card.done{border-color:rgba(16,185,129,.3);--cc:var(--ok)}
+.card.locked{opacity:.6;pointer-events:none}
+.card.unlocking{animation:unlockPulse .5s ease}
+@keyframes unlockPulse{0%{box-shadow:0 0 0 0 rgba(0,229,255,.4)}70%{box-shadow:0 0 0 12px rgba(0,229,255,0)}100%{box-shadow:none}}
+
+.ch{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cn{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;flex-shrink:0}
+.ct{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.cs{font-size:12px;color:var(--mu);margin-top:2px}
+.cbadge{margin-left:auto;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;text-transform:uppercase;white-space:nowrap;transition:all .3s}
+.bw{background:rgba(90,112,145,.15);color:var(--mu);border:1px solid var(--bd)}
+.br{background:rgba(0,229,255,.1);color:var(--ac);border:1px solid rgba(0,229,255,.3)}
+.bd2{background:rgba(16,185,129,.1);color:var(--ok);border:1px solid rgba(16,185,129,.3)}
+
+/* API box */
+#apib{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+.ki{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--tx);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.ki:focus{border-color:var(--ac)}
+.kr{display:flex;gap:8px;align-items:center;margin-top:8px}
+.eb{padding:0;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;cursor:pointer;font-size:15px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ks{font-size:12px;margin-top:5px}
+.sr{display:flex;align-items:center;gap:7px;margin-top:6px}
+.kg{margin-top:8px;padding:10px;background:#0a0e17;border-radius:9px;font-size:12px;color:var(--mu);line-height:1.8}
+
+/* Upload */
+.ugrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ul{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.uz{border:2px dashed var(--bd);border-radius:12px;text-align:center;cursor:pointer;transition:all .25s;background:var(--sf2);position:relative;aspect-ratio:9/16;max-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.uz:hover,.uz.drag{border-color:var(--ac);background:rgba(0,229,255,.05);transform:scale(1.01)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz .ico{font-size:26px;transition:transform .2s}
+.uz:hover .ico{transform:scale(1.1)}
+.uz h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--tx)}
+.uz p{font-size:10px;color:var(--mu)}
+.pw{border-radius:12px;overflow:hidden;position:relative;aspect-ratio:9/16;max-height:240px;background:var(--sf2);display:none}
+.pw img{width:100%;height:100%;object-fit:cover;display:block}
+.pw .rb{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;border-radius:7px;color:#fff;font-size:11px;padding:5px 9px;cursor:pointer;min-height:30px;font-family:'DM Sans',sans-serif;transition:background .2s}
+.pw .rb:hover{background:var(--er)}
+/* Upload success flash */
+.pw.just-uploaded{animation:imgFlash .4s ease}
+@keyframes imgFlash{0%{box-shadow:0 0 0 3px var(--ok)}100%{box-shadow:none}}
+
+/* Batch grid */
+.bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+@media(max-width:420px){.bgrid{grid-template-columns:repeat(3,1fr)}}
+.buz{border:2px dashed var(--bd);border-radius:10px;aspect-ratio:9/16;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--sf2);position:relative;font-size:18px;transition:all .2s;gap:3px}
+.buz:hover{border-color:var(--ac);transform:scale(1.03)}
+.buz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.buz span{font-size:9px;color:var(--mu);font-weight:600;text-transform:uppercase}
+.bpw{border-radius:10px;overflow:hidden;aspect-ratio:9/16;position:relative;background:var(--sf2)}
+.bpw img{width:100%;height:100%;object-fit:cover;display:block}
+.bpw .rb{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;border-radius:5px;color:#fff;font-size:9px;padding:3px 6px;cursor:pointer;min-height:22px;font-family:'DM Sans',sans-serif}
+
+/* Mode toggle */
+.mode-row{display:flex;gap:8px;margin-top:14px;background:var(--sf2);border-radius:12px;padding:4px}
+.mbtn{flex:1;padding:9px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .25s;border:none;background:transparent;color:var(--mu)}
+.mbtn.on{background:var(--sf);color:var(--ac);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* Inputs */
+.il{font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:14px;display:block}
+textarea,.ta{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:48px;outline:none;transition:border-color .2s;line-height:1.5;margin-top:4px}
+textarea:focus,.ta:focus{border-color:var(--ac)}
+textarea::placeholder,.ta::placeholder{color:var(--mu)}
+/* Editable prompt */
+.prompt-edit{background:var(--sf2);border:1px solid rgba(0,229,255,.3);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.7;min-height:120px;max-height:280px;overflow-y:auto;outline:none;margin-top:4px;transition:border-color .2s;white-space:pre-wrap;word-break:break-word}
+.prompt-edit:focus{border-color:var(--ac)}
+.prompt-edit:empty:before{content:attr(data-ph);color:var(--mu)}
+
+/* Tags */
+.trow{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}
+.tag{padding:7px 13px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);color:var(--mu);transition:all .2s;background:var(--sf2);min-height:34px;display:flex;align-items:center}
+.tag:hover{border-color:var(--mu);color:var(--tx)}
+.tag.on{background:rgba(124,58,237,.15);border-color:var(--ac2);color:#a78bfa}
+
+/* Buttons */
+.btn{padding:13px 20px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all .2s;width:100%;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .2s}
+.btn:hover::after{background:rgba(255,255,255,.05)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-c{background:linear-gradient(135deg,var(--ac),#0080ff);color:#000;box-shadow:0 4px 16px rgba(0,229,255,.2)}
+.btn-c:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,.3)}
+.btn-g{background:linear-gradient(135deg,#34d399,#059669);color:#000}
+.btn-g:hover:not(:disabled){transform:translateY(-1px)}
+.btn-p{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff}
+.btn-p:hover:not(:disabled){transform:translateY(-1px)}
+.btn-a{background:linear-gradient(135deg,var(--ac3),#f97316);color:#000}
+.btn-a:hover:not(:disabled){transform:translateY(-1px)}
+.btn-ghost{background:var(--sf2);color:var(--mu);border:1px solid var(--bd);margin-top:8px}
+.btn-ghost:hover:not(:disabled){border-color:var(--ac);color:var(--ac)}
+.btn-export{background:linear-gradient(135deg,#34d399,#0284c7);color:#000}
+.btn-export:hover:not(:disabled){transform:translateY(-1px)}
+
+/* Spinner */
+.sp{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.25);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+.sp-w{border-color:rgba(255,255,255,.25);border-top-color:#fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Progress bar */
+.prog{height:3px;background:var(--bd);border-radius:3px;overflow:hidden;margin-top:8px;display:none}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;transition:width .3s ease;width:0%}
+
+/* Result box */
+.rb2{background:var(--sf2);border:1px solid var(--bd);border-radius:13px;padding:14px;margin-top:10px;transition:border-color .3s}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.rl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.rt{font-size:13px;line-height:1.7;color:var(--tx);white-space:pre-wrap;max-height:200px;overflow-y:auto}
+.rt::-webkit-scrollbar{width:3px}.rt::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+/* Copy button with success state */
+.cpb{padding:5px 11px;background:var(--sf);border:1px solid var(--bd);border-radius:7px;color:var(--mu);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:28px;font-family:'DM Sans',sans-serif}
+.cpb:hover{border-color:var(--ac);color:var(--ac)}
+.cpb.copied{border-color:var(--ok);color:var(--ok);background:rgba(16,185,129,.1)}
+
+/* Spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.spec-item{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:9px 11px}
+.spec-name{font-size:12px;font-weight:700;font-family:'Syne',sans-serif}
+.spec-info{font-size:11px;color:var(--mu);margin-top:2px;line-height:1.5}
+
+/* Launch grid */
+.launch-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.lbtn{background:var(--sf2);border-radius:12px;padding:12px;cursor:pointer;text-align:left;border:1px solid var(--bd);transition:all .2s;display:block;width:100%}
+.lbtn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.lname{font-family:'Syne',sans-serif;font-weight:700;font-size:13px}
+.ldesc{font-size:11px;color:var(--mu);margin-top:2px}
+
+/* Tabs */
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tab{padding:7px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bd);color:var(--mu);background:var(--sf2);font-family:'Syne',sans-serif;transition:all .2s;min-height:34px}
+.tab:hover{border-color:var(--mu)}
+.tab.on{border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.1);color:var(--ac)}
+
+/* Connector */
+.conn{text-align:center;color:var(--bd);font-size:16px;padding:2px 0;margin:0 0 12px}
+
+/* Locked overlay hint */
+.lock-hint{text-align:center;padding:12px;color:var(--mu);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:14px;left:14px;max-width:340px;margin:0 auto;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;font-size:13px;transform:translateY(120px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:200;text-align:center}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,.4);color:var(--ok)}
+.toast.error{border-color:rgba(239,68,68,.4);color:var(--er)}
+.toast.info{border-color:rgba(0,229,255,.3);color:var(--ac)}
+
+/* History panel */
+.hist-item{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .2s}
+.hist-item:hover{border-color:var(--ac)}
+.hist-time{font-size:10px;color:var(--mu);margin-bottom:4px}
+.hist-preview{font-size:12px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Scrollbar global */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+</style>
+</head>
+<body>
+<div class="w">
+
+<header>
+  <div class="badge">✦ AI Creative Studio</div>
+  <h1>Analyze. Prompt. Sell.</h1>
+  <p class="sub">Upload gambar → AI generate prompt → Copy ke Google Flow / Grok / Kling</p>
+</header>
+
+<!-- API Key -->
+<div id="apib">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <span style="font-size:18px">🔑</span>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">OpenRouter API Key</div>
+      <div style="font-size:12px;color:var(--mu)">Vision + Text — 200+ models, ada FREE tier</div>
+    </div>
+  </div>
+  <div class="kr">
+    <input type="password" class="ki" id="gk" placeholder="sk-or-v1-..." oninput="ck()">
+    <button class="eb" id="eb" onclick="te()" title="Tunjuk/sembunyi key">👁️</button>
+  </div>
+  <div class="ks" id="ks" style="color:var(--mu)">Masukkan OpenRouter API key untuk mula</div>
+  <div class="sr">
+    <input type="checkbox" id="sc" onchange="sk()" style="cursor:pointer;width:16px;height:16px">
+    <label for="sc" style="font-size:12px;color:var(--mu);cursor:pointer">Simpan key dalam browser (auto-ingat)</label>
+  </div>
+  <div class="kg">
+    💡 <strong style="color:var(--tx)">Cara dapat OpenRouter API Key (FREE):</strong><br>
+    1. Pergi → <strong style="color:var(--ac)">openrouter.ai</strong> → Sign Up<br>
+    2. Klik <strong style="color:var(--tx)">Keys</strong> → Create Key<br>
+    3. Copy key (sk-or-v1-...) → Paste kat sini → tick Simpan ✓<br>
+    <span style="color:var(--ok)">✓ Free models available — vision + text (Gemini, Llama, dll)</span>
+  </div>
+</div>
+
+<!-- Top Actions -->
+<div class="topbar">
+  <button onclick="showHistory()" title="Lihat prompt history">
+    🕐 History
+  </button>
+  <button onclick="exportAll()" title="Download semua output">
+    💾 Export
+  </button>
+  <button class="danger" onclick="resetAll()" title="Reset semua">
+    ↺ Reset
+  </button>
+</div>
+
+<!-- CARD 1: Upload & Generate -->
+<div class="card" id="c1" style="--cc:var(--ac)">
+  <div class="ch">
+    <div class="cn" style="background:rgba(0,229,255,.15);color:var(--ac);border:1px solid rgba(0,229,255,.3)">1</div>
+    <div>
+      <div class="ct">Upload & Generate Prompt</div>
+      <div class="cs">AI analyze → prompt untuk Google Flow / Grok / Kling</div>
+    </div>
+    <span class="cbadge br" id="b1">Ready</span>
+  </div>
+
+  <div class="ugrid">
+    <div>
+      <div class="ul">🖼️ Scene Reference</div>
+      <div class="uz" id="u1" ondragover="dv(event,'u1')" ondragleave="dl('u1')" ondrop="dd(event,'ref')">
+        <input type="file" accept="image/*" onchange="fi(event,'ref')">
+        <div class="ico">🖼️</div>
+        <h3>Reference</h3>
+        <p>Model / Background</p>
+      </div>
+      <div class="pw" id="p1">
+        <img id="i1" src="" alt="ref">
+        <button class="rb" onclick="rst('ref')">✕ Reset</button>
+      </div>
+    </div>
+    <div>
+      <div class="ul">📦 Produk</div>
+      <div class="uz" id="u2" ondragover="dv(event,'u2')" ondragleave="dl('u2')" ondrop="dd(event,'prod')">
+        <input type="file" accept="image/*" onchange="fi(event,'prod')">
+        <div class="ico">📦</div>
+        <h3>Product</h3>
+        <p>Gambar produk / baju</p>
+      </div>
+      <div class="pw" id="p2">
+        <img id="i2" src="" alt="prod">
+        <button class="rb" onclick="rst('prod')">✕ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Info Screenshot (optional) -->
+  <div style="margin-top:12px;padding:12px;background:rgba(245,158,11,.05);border:1px dashed rgba(245,158,11,.3);border-radius:14px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:16px">📋</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--ac3)">Product Info Screenshot <span style="font-size:11px;background:rgba(245,158,11,.15);color:var(--ac3);padding:2px 8px;border-radius:100px">OPTIONAL</span></div>
+        <div style="font-size:11px;color:var(--mu);margin-top:2px">Screenshot listing Shopee/website — AI baca dan extract detail kain, material, warna secara auto</div>
+      </div>
+    </div>
+    <div id="ssZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(245,158,11,.3)" ondragover="dv(event,'ssZone')" ondragleave="dl('ssZone')" ondrop="dd(event,'ss')">
+      <input type="file" accept="image/*" onchange="fi(event,'ss')">
+      <div class="ico">📋</div>
+      <h3 style="color:var(--ac3)">Upload Screenshot</h3>
+      <p>Shopee listing / website product info</p>
+    </div>
+    <div id="ssPreview" style="display:none;margin-top:8px">
+      <img id="ssImg" src="" alt="screenshot" style="width:100%;border-radius:10px;max-height:200px;object-fit:contain;background:var(--sf2);display:block">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <div style="font-size:11px;color:var(--ok)">✓ Screenshot ready — AI akan baca detail produk</div>
+        <button onclick="rst('ss')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:4px 9px;cursor:pointer">✕ Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <span class="il">✍️ Detail produk tambahan (optional)</span>
+  <textarea id="pd" rows="2" placeholder="Contoh: baju kurung moden navy blue, material satin, butang emas..."></textarea>
+
+  <!-- Mode toggle -->
+  <div class="mode-row">
+    <button class="mbtn on" id="mS" onclick="setMode('single')">✦ Single</button>
+    <button class="mbtn" id="mB" onclick="setMode('batch')">⚡ Batch (5 Produk)</button>
+  </div>
+
+  <!-- Single -->
+  <div id="singleDiv">
+    <button class="btn btn-c" id="ba" onclick="an()">✨ Analyze & Generate Prompt</button>
+  </div>
+
+  <!-- Batch -->
+  <div id="batchDiv" style="display:none">
+    <span class="il" style="margin-top:10px">📦 Upload sehingga 5 gambar produk</span>
+    <div class="bgrid" id="bgrid"></div>
+    <div class="prog" id="bprog"><div class="prog-bar" id="bprogbar"></div></div>
+    <button class="btn btn-c" id="bba" onclick="batchAn()">⚡ Batch Generate Semua</button>
+  </div>
+
+  <!-- Single Result -->
+  <div id="pr" style="display:none">
+    <div class="rb2" style="border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.03)">
+      <div class="rh">
+        <span class="rl" style="color:var(--ac)">📝 Prompt + Negative — Edit jika perlu</span>
+        <button class="cpb" id="cpbMain" onclick="cpEdit('promptEdit')" style="color:var(--ac);border-color:rgba(0,229,255,.3)">Copy All</button>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">✏️ Boleh edit terus — tap untuk tukar. Upload KEDUA gambar + paste ke tools.</div>
+      <div class="prompt-edit" id="promptEdit" contenteditable="true" data-ph="Prompt akan muncul di sini..."></div>
+    </div>
+
+    <!-- Platform specs -->
+    <div style="margin-top:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">📐 Platform Image Specs</div>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-name" style="color:#f472b6">🛍️ Shopee</div><div class="spec-info">1:1 — 1000×1000px<br>JPG/PNG, max 2MB</div></div>
+        <div class="spec-item"><div class="spec-name" style="color:#f9a8d4">🎵 TikTok</div><div class="spec-info">9:16 — 1080×1920px<br>JPG/PNG, max 20MB</div></div>
+        <div class="spec-item"><div class="spec-name" style="color:#a78bfa">⚡ Grok Aurora</div><div class="spec-info">9:16 — 768×1024px<br>Output PNG</div></div>
+        <div class="spec-item"><div class="spec-name" style="color:var(--ac)">🎬 Google Flow</div><div class="spec-info">9:16 — 576×1024px<br>Output JPG/PNG</div></div>
+        <div class="spec-item"><div class="spec-name" style="color:#34d399">📷 Instagram</div><div class="spec-info">4:5 — 1080×1350px<br>JPG/PNG, max 8MB</div></div>
+        <div class="spec-item"><div class="spec-name" style="color:var(--ac3)">🎥 Kling AI</div><div class="spec-info">9:16 atau 1:1<br>Max 10MB per image</div></div>
+      </div>
+    </div>
+
+    <!-- Launch -->
+    <div style="margin-top:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🚀 Buka & Auto-Copy Prompt</div>
+      <div class="launch-grid">
+        <button class="lbtn" onclick="launch('https://grok.com/image')" style="border-color:rgba(124,58,237,.3)">
+          <div class="lname" style="color:#a78bfa">⚡ Grok Web</div>
+          <div class="ldesc">Copy → buka Grok Image Gen</div>
+        </button>
+        <button class="lbtn" onclick="launch('https://labs.google/fx/tools/flow')" style="border-color:rgba(0,229,255,.3)">
+          <div class="lname" style="color:var(--ac)">🎬 Google Flow</div>
+          <div class="ldesc">Copy → buka Google Flow</div>
+        </button>
+        <button class="lbtn" onclick="launch('https://kling.ai')" style="border-color:rgba(245,158,11,.3)">
+          <div class="lname" style="color:var(--ac3)">🎥 Kling AI</div>
+          <div class="ldesc">Copy → buka Kling.ai</div>
+        </button>
+        <button class="lbtn" onclick="launch('https://www.midjourney.com')" style="border-color:rgba(52,211,153,.3)">
+          <div class="lname" style="color:#34d399">🎨 Midjourney</div>
+          <div class="ldesc">Copy → buka Midjourney</div>
+        </button>
+      </div>
+      <div style="margin-top:7px;padding:8px 11px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:9px;font-size:11px;color:var(--mu)">
+        💡 Klik button → prompt auto-copy → tab baru buka → paste + upload kedua gambar
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch Result -->
+  <div id="batchResult" style="display:none;margin-top:12px">
+    <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚡ Batch Results</div>
+    <div class="tab-row" id="batchTabs"></div>
+    <div id="batchContent"></div>
+  </div>
+</div>
+
+<div class="conn">↓</div>
+
+<!-- CARD 2: Caption -->
+<div class="card" id="c2" style="--cc:#34d399">
+  <div class="ch">
+    <div class="cn" style="background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3)">2</div>
+    <div><div class="ct">Caption Generator</div><div class="cs">Shopee listing & TikTok video script</div></div>
+    <span class="cbadge bw" id="b2">Step 1 First</span>
+  </div>
+  <div id="c2lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
+  <div id="c2body" style="display:none">
+    <span class="il">📝 Jenis caption</span>
+    <div class="trow">
+      <span class="tag on" onclick="sel(this,'cap','both')">📦 Shopee + TikTok</span>
+      <span class="tag" onclick="sel(this,'cap','shopee')">🛍️ Shopee</span>
+      <span class="tag" onclick="sel(this,'cap','tiktok')">🎵 TikTok</span>
+    </div>
+    <span class="il">✍️ Info tambahan (optional)</span>
+    <textarea id="ce" rows="2" placeholder="Contoh: harga RM89, free shipping, COD, promosi raya..."></textarea>
+    <button class="btn btn-g" id="bc" onclick="genCap()">✍️ Generate Caption</button>
+    <div id="cr" style="display:none">
+      <div id="scapbox" class="rb2" style="border-color:rgba(52,211,153,.3);display:none">
+        <div class="rh"><span class="rl" style="color:#34d399">🛍️ Shopee Listing</span><button class="cpb" id="cpbShop" onclick="cpBtn('sct','cpbShop')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
+        <div class="rt" id="sct"></div>
+      </div>
+      <div id="tcapbox" class="rb2" style="border-color:rgba(52,211,153,.3);margin-top:8px;display:none">
+        <div class="rh"><span class="rl" style="color:#34d399">🎵 TikTok Script</span><button class="cpb" id="cpbTT" onclick="cpBtn('tct','cpbTT')" style="color:#34d399;border-color:rgba(52,211,153,.3)">Copy</button></div>
+        <div class="rt" id="tct"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="conn">↓</div>
+
+<!-- CARD 3: Hashtag -->
+<div class="card" id="c3" style="--cc:#f472b6">
+  <div class="ch">
+    <div class="cn" style="background:rgba(244,114,182,.15);color:#f472b6;border:1px solid rgba(244,114,182,.3)">#</div>
+    <div><div class="ct">Hashtag Generator</div><div class="cs">Shopee & TikTok Affiliate</div></div>
+    <span class="cbadge bw" id="b3">Step 1 First</span>
+  </div>
+  <div id="c3lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
+  <div id="c3body" style="display:none">
+    <span class="il">🏷️ Platform</span>
+    <div class="trow">
+      <span class="tag on" onclick="sel(this,'ht','both')">🛒 Shopee + TikTok</span>
+      <span class="tag" onclick="sel(this,'ht','shopee')">🛍️ Shopee</span>
+      <span class="tag" onclick="sel(this,'ht','tiktok')">🎵 TikTok</span>
+    </div>
+    <span class="il">✍️ Info tambahan (optional)</span>
+    <textarea id="he" rows="2" placeholder="Contoh: harga RM89, COD available, free gift..."></textarea>
+    <button class="btn btn-p" id="bh" onclick="gh()"># Generate Hashtags</button>
+    <div id="hr" style="display:none">
+      <div id="sb" class="rb2" style="border-color:rgba(244,114,182,.3);display:none">
+        <div class="rh"><span class="rl">🛍️ Shopee</span><button class="cpb" id="cpbSH" onclick="cpBtn('st','cpbSH')">Copy</button></div>
+        <div class="rt" id="st"></div>
+      </div>
+      <div id="tb" class="rb2" style="border-color:rgba(244,114,182,.3);margin-top:8px;display:none">
+        <div class="rh"><span class="rl">🎵 TikTok</span><button class="cpb" id="cpbTH" onclick="cpBtn('tt','cpbTH')">Copy</button></div>
+        <div class="rt" id="tt"></div>
+      </div>
+      <div class="rb2" style="margin-top:8px;background:rgba(244,114,182,.04);border-color:rgba(244,114,182,.2)">
+        <div class="rl" style="color:#f472b6;margin-bottom:7px">💡 Tips</div>
+        <div class="rt" id="ht2" style="color:var(--mu);font-size:13px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="conn">↓</div>
+
+<!-- CARD 4: Video Prompt -->
+<div class="card" id="c4" style="--cc:var(--ac3)">
+  <div class="ch">
+    <div class="cn" style="background:rgba(245,158,11,.15);color:var(--ac3);border:1px solid rgba(245,158,11,.3)">4</div>
+    <div><div class="ct">Video AI Prompt</div><div class="cs">Grok Aurora & Google Flow</div></div>
+    <span class="cbadge bw" id="b4">Step 1 First</span>
+  </div>
+  <div id="c4lock" class="lock-hint">🔒 Selesaikan Step 1 dulu untuk unlock</div>
+  <div id="c4body" style="display:none">
+    <span class="il">🎬 Platform</span>
+    <div class="trow">
+      <span class="tag on" onclick="sel(this,'pl','Grok Aurora 6s')">⚡ Grok 6s</span>
+      <span class="tag" onclick="sel(this,'pl','Grok Aurora 10s')">⚡ Grok 10s</span>
+      <span class="tag" onclick="sel(this,'pl','Google Flow 8s')">🎬 Google Flow</span>
+    </div>
+    <span class="il">✍️ Arahan video (optional)</span>
+    <textarea id="ve" rows="2" placeholder="Contoh: slow zoom in, model pusing, produk berkilat..."></textarea>
+    <button class="btn btn-a" id="bv" onclick="gv()">🎬 Generate Video Prompt</button>
+    <div id="vr" style="display:none">
+      <div class="rb2" style="border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05)">
+        <div class="rh">
+          <span class="rl" style="color:#a78bfa">🎬 <span id="vpl"></span> — Full Prompt</span>
+          <button class="cpb" id="cpbVP" onclick="cpBtn('vp','cpbVP')" style="color:#a78bfa;border-color:rgba(124,58,237,.3)">Copy All</button>
+        </div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Prompt + Negative + Camera dalam satu box — copy terus paste ke tools</div>
+        <div class="rt" id="vp"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="conn">↓</div>
+
+<!-- Export All -->
+<div class="card" style="--cc:#34d399;text-align:center;padding:16px 20px">
+  <button class="btn btn-export" style="margin-top:0" onclick="exportAll()">
+    💾 Download Semua Output (.txt)
+  </button>
+</div>
+
+<!-- History Modal -->
+<div id="histModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;padding:20px;overflow-y:auto">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;max-width:600px;margin:0 auto;padding:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">🕐 Prompt History</div>
+      <button onclick="closeHistory()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--mu);cursor:pointer;padding:6px 12px;font-size:13px">Tutup</button>
+    </div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────
+const S={
+  ref:null, refMime:'image/jpeg',
+  prod:null, prodMime:'image/jpeg',
+  ss:null, ssMime:'image/jpeg',
+  batchProds:[null,null,null,null,null],
+  mode:'single',
+  ht:'both', cap:'both', pl:'Grok Aurora 6s',
+  ana:'', done:false
+};
+
+// ─── Toast ────────────────────────────────────────────
+let toastTimer;
+function toast(m, t='success'){
+  clearTimeout(toastTimer);
+  const el=document.getElementById('toast');
+  el.textContent=m; el.className=`toast show ${t}`;
+  toastTimer=setTimeout(()=>el.className='toast', 3500);
+}
+
+// ─── Tag selector ─────────────────────────────────────
+function sel(el, k, v){
+  el.closest('.trow').querySelectorAll('.tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on'); S[k]=v;
+}
+
+// ─── API Key ──────────────────────────────────────────
+function gk(){return(document.getElementById('gk')?.value||localStorage.getItem('openrouter_key')||'').trim()}
+function ck(){
+  const k=document.getElementById('gk').value.trim();
+  const s=document.getElementById('ks'), i=document.getElementById('gk');
+  if(!k){s.textContent='Masukkan OpenRouter API key untuk mula';s.style.color='var(--mu)';i.style.borderColor='var(--bd)'}
+  else if(!k.startsWith('sk-or-')){s.textContent='⚠️ Format salah — mesti bermula sk-or-...';s.style.color='var(--ac3)';i.style.borderColor='var(--ac3)'}
+  else{s.textContent='✓ OpenRouter API key sedia digunakan';s.style.color='var(--ok)';i.style.borderColor='var(--ok)'}
+}
+function sk(){
+  const c=document.getElementById('sc'), k=document.getElementById('gk').value.trim();
+  if(c.checked&&k.startsWith('sk-or-')){localStorage.setItem('openrouter_key',k);toast('✓ Key disimpan')}
+  else if(c.checked){toast('Format key salah (sk-or-...)','error');c.checked=false}
+  else localStorage.removeItem('openrouter_key');
+}
+function te(){
+  const i=document.getElementById('gk'), b=document.getElementById('eb');
+  i.type=i.type==='password'?'text':'password';
+  b.textContent=i.type==='password'?'👁️':'🙈';
+}
+
+// ─── Reset All ────────────────────────────────────────
+function resetAll(){
+  if(!confirm('Reset semua? Semua output dan gambar akan dibuang.'))return;
+  S.ref=null;S.prod=null;S.ss=null;S.batchProds=[null,null,null,null,null];S.ana='';S.done=false;
+  ['u1','u2'].forEach(id=>document.getElementById(id).style.display='flex');
+  ['p1','p2'].forEach(id=>document.getElementById(id).style.display='none');
+  ['i1','i2'].forEach(id=>document.getElementById(id).src='');
+  // Reset screenshot
+  document.getElementById('ssZone').style.display='flex';
+  document.getElementById('ssPreview').style.display='none';
+  document.getElementById('ssImg').src='';
+  ['pr','batchResult','cr','hr','vr'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('promptEdit').textContent='';
+  document.getElementById('b1').textContent='Ready';document.getElementById('b1').className='cbadge br';
+  ['b2','b3','b4'].forEach(id=>{document.getElementById(id).textContent='Step 1 First';document.getElementById(id).className='cbadge bw'});
+  ['c1','c2','c3','c4'].forEach(id=>document.getElementById(id).classList.remove('done'));
+  // Re-lock cards
+  ['c2lock','c3lock','c4lock'].forEach(id=>document.getElementById(id).style.display='flex');
+  ['c2body','c3body','c4body'].forEach(id=>document.getElementById(id).style.display='none');
+  renderBatchGrid();
+  toast('↺ Reset selesai','info');
+}
+
+// ─── Mode Toggle ──────────────────────────────────────
+function setMode(m){
+  S.mode=m;
+  document.getElementById('mS').classList.toggle('on',m==='single');
+  document.getElementById('mB').classList.toggle('on',m==='batch');
+  document.getElementById('singleDiv').style.display=m==='single'?'block':'none';
+  document.getElementById('batchDiv').style.display=m==='batch'?'block':'none';
+  if(m==='batch')renderBatchGrid();
+}
+
+// ─── Batch Grid ───────────────────────────────────────
+function renderBatchGrid(){
+  const g=document.getElementById('bgrid');
+  if(!g)return;
+  g.innerHTML='';
+  for(let i=0;i<5;i++){
+    const p=S.batchProds[i];
+    const label=`<div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;margin-bottom:4px;text-transform:uppercase">P${i+1}</div>`;
+    if(p){
+      g.innerHTML+=`<div>${label}<div class="bpw"><img src="${p.url}" style="width:100%;height:100%;object-fit:cover;display:block"><button class="rb" onclick="rmBatch(${i})">✕</button></div></div>`;
+    } else {
+      g.innerHTML+=`<div>${label}<label class="buz"><input type="file" accept="image/*" onchange="addBatch(event,${i})">📦<span>Tap</span></label></div>`;
+    }
+  }
+}
+function addBatch(e,i){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const url=ev.target.result;
+    S.batchProds[i]={url,b64:url.split(',')[1],mime:url.split(';')[0].split(':')[1]||'image/jpeg'};
+    renderBatchGrid();
+    toast(`✓ Produk ${i+1} uploaded`);
+  };r.readAsDataURL(f);
+}
+function rmBatch(i){S.batchProds[i]=null;renderBatchGrid();}
+
+// ─── File Handling ────────────────────────────────────
+function fi(e,t){const f=e.target.files[0];if(f)li(f,t)}
+function dv(e,id){e.preventDefault();document.getElementById(id).classList.add('drag')}
+function dl(id){document.getElementById(id).classList.remove('drag')}
+function dd(e,t){
+  e.preventDefault();
+  const id=t==='ref'?'u1':'u2';
+  document.getElementById(id).classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/'))li(f,t);
+  else toast('Sila upload fail imej sahaja','error');
+}
+function li(file, t){
+  const r=new FileReader();
+  r.onload=e=>{
+    const url=e.target.result;
+    const mime=url.split(';')[0].split(':')[1]||'image/jpeg';
+    const b64=url.split(',')[1];
+    if(t==='ref'){
+      S.ref=b64;S.refMime=mime;
+      document.getElementById('i1').src=url;
+      document.getElementById('u1').style.display='none';
+      const pw=document.getElementById('p1');
+      pw.style.display='block';pw.classList.add('just-uploaded');
+      setTimeout(()=>pw.classList.remove('just-uploaded'),500);
+    } else if(t==='ss'){
+      S.ss=b64;S.ssMime=mime;
+      document.getElementById('ssImg').src=url;
+      document.getElementById('ssZone').style.display='none';
+      document.getElementById('ssPreview').style.display='block';
+    } else {
+      S.prod=b64;S.prodMime=mime;
+      document.getElementById('i2').src=url;
+      document.getElementById('u2').style.display='none';
+      const pw=document.getElementById('p2');
+      pw.style.display='block';pw.classList.add('just-uploaded');
+      setTimeout(()=>pw.classList.remove('just-uploaded'),500);
+    }
+    toast(`✓ ${t==='ref'?'Reference':t==='ss'?'Screenshot':'Produk'} uploaded!`);
+  };r.readAsDataURL(file);
+}
+function rst(t){
+  if(t==='ref'){S.ref=null;document.getElementById('u1').style.display='flex';document.getElementById('p1').style.display='none';}
+  else if(t==='ss'){S.ss=null;document.getElementById('ssZone').style.display='flex';document.getElementById('ssPreview').style.display='none';document.getElementById('ssImg').src='';}
+  else{S.prod=null;document.getElementById('u2').style.display='flex';document.getElementById('p2').style.display='none';}
+}
+
+// ─── OpenRouter API with Auto-Fallback ────────────────
+const VISION_MODELS=[
+  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+  'nvidia/nemotron-nano-12b-v2-vl:free'
+];
+const TEXT_MODELS=[
+  'deepseek/deepseek-v4-flash:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'openai/gpt-oss-120b:free',
+  'google/gemma-4-31b-it:free',
+  'minimax/minimax-m2.5:free',
+  'z-ai/glm-4.5-air:free'
+];
+
+async function groq(msgs, sys, vis=false){
+  const key=gk();
+  if(!key)throw new Error('OpenRouter API key belum dimasukkan! Pergi openrouter.ai');
+  const models=vis?VISION_MODELS:TEXT_MODELS;
+  const m=[];if(sys)m.push({role:'system',content:sys});m.push(...msgs);
+  let lastErr='';
+  for(let i=0;i<models.length;i++){
+    const model=models[i];
+    try{
+      const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+key,
+          'HTTP-Referer':window.location.href,
+          'X-Title':'AI Creative Studio'
+        },
+        body:JSON.stringify({model,messages:m,max_tokens:1500,temperature:0.7})
+      });
+      const d=await res.json();
+      if(!res.ok||d.error){
+        lastErr=d.error?.message||d.error?.code||'HTTP '+res.status;
+        console.warn(`[Model ${i+1}/${models.length}] ${model} gagal: ${lastErr} → cuba model seterusnya...`);
+        continue;
+      }
+      const content=d.choices?.[0]?.message?.content||'';
+      if(!content){lastErr='Empty response';console.warn(`[Model ${i+1}] ${model} empty → next...`);continue;}
+      if(i>0)toast(`⚡ Auto-switch ke ${model.split('/')[1].split(':')[0]}`,'info');
+      return content;
+    }catch(e){
+      lastErr=e.message;
+      console.warn(`[Model ${i+1}/${models.length}] ${model} error: ${e.message} → cuba model seterusnya...`);
+      continue;
+    }
+  }
+  throw new Error(`Semua ${models.length} model gagal. Last error: ${lastErr}`);
+}
+
+// ─── Build Prompt ─────────────────────────────────────
+function buildInstruction(hasRef, hasProd, ex){
+  const hasSS=!!S.ss;
+  if(hasRef&&hasProd){
+    return `You are an expert AI image prompt engineer for fashion affiliate marketing.
+
+Analyze all provided images carefully and generate a prompt + negative prompt. ALL OUTPUT MUST BE IN ENGLISH ONLY.
+${hasSS?'\nIMPORTANT: Image 3 is a product info screenshot. Read ALL text in it carefully — extract fabric type, material composition, color names, texture, cut details, measurements, and any other specifications. Incorporate ALL these extracted details into the prompt to make it as accurate as possible.\n':''}
+Required format:
+PROMPT:
+"Using Image 1 as the complete scene reference — preserve exactly: [key scene elements: background setting, lighting direction and quality, color grading, model pose, hand position, camera angle, depth of field, props]. Replace only the clothing/outfit with the garment shown in Image 2: [exact color names, fabric texture${hasSS?' (use specific details from Image 3 screenshot)':''}, cut/silhouette, collar style, sleeve length, pattern/print detail, buttons/embroidery/trim/hem detail${hasSS?', material composition from product info':''}]. photorealistic, ultra-detailed, professional fashion photography, 9:16 vertical format"
+
+NEGATIVE:
+[specific negatives in English: wrong fabric color, distorted face, deformed hands, blurry, bad anatomy, watermark, logo, low resolution, wrong outfit style, inconsistent lighting]
+${ex?'\nExtra info: '+ex:''}
+
+Start response with "PROMPT:" directly. No explanation, no preamble.`;
+  }
+  return `You are an expert AI image prompt engineer. Analyze this ${hasProd?'product':'scene'} image.${hasSS?' Also read Image 2 (product info screenshot) and extract all fabric/material/color details to incorporate into the prompt.':''}
+${ex?'Product details: '+ex:''}
+ALL OUTPUT IN ENGLISH ONLY.
+Format:
+PROMPT:
+[professional English prompt ending with "photorealistic, professional fashion photography, 9:16 vertical format"]
+NEGATIVE:
+[negative terms in English]`;
+}
+
+function parsePromptResult(result){
+  const main=(result.match(/PROMPT:\n?([\s\S]*?)(?=\nNEGATIVE:|$)/)?.[1]||result).trim();
+  const neg=(result.match(/NEGATIVE:\n?([\s\S]*?)$/)?.[1]||'blurry, low quality, distorted, deformed hands, bad anatomy, watermark').trim();
+  return main+'\n\n--no '+neg;
+}
+
+// ─── Unlock Cards ─────────────────────────────────────
+function unlockCards(){
+  S.done=true;
+  ['c2','c3','c4'].forEach((id,i)=>{
+    const n=i+2;
+    document.getElementById(`c${n}lock`).style.display='none';
+    document.getElementById(`c${n}body`).style.display='block';
+    document.getElementById(`b${n}`).textContent='Ready';
+    document.getElementById(`b${n}`).className='cbadge br';
+    const card=document.getElementById(`c${n}`);
+    card.classList.remove('locked');
+    card.classList.add('unlocking');
+    setTimeout(()=>card.classList.remove('unlocking'),600);
+  });
+  document.getElementById('c1').classList.add('done');
+  document.getElementById('b1').textContent='✓ Done';
+  document.getElementById('b1').className='cbadge bd2';
+}
+
+// ─── Prompt History ───────────────────────────────────
+function saveHistory(prompt){
+  try{
+    const hist=JSON.parse(localStorage.getItem('prompt_history')||'[]');
+    hist.unshift({prompt,time:new Date().toLocaleString('ms-MY'),preview:prompt.slice(0,80)+'...'});
+    localStorage.setItem('prompt_history',JSON.stringify(hist.slice(0,5)));
+  }catch(e){}
+}
+function showHistory(){
+  const hist=JSON.parse(localStorage.getItem('prompt_history')||'[]');
+  const list=document.getElementById('histList');
+  if(!hist.length){list.innerHTML='<div style="text-align:center;color:var(--mu);padding:20px;font-size:13px">Belum ada history. Generate prompt dulu.</div>';
+  }else{
+    list.innerHTML=hist.map((h,i)=>`
+      <div class="hist-item" onclick="loadHistory(${i})">
+        <div class="hist-time">${h.time}</div>
+        <div class="hist-preview">${h.preview}</div>
+        <div style="font-size:10px;color:var(--ac);margin-top:4px;font-weight:600">Tap untuk load →</div>
+      </div>`).join('');
+  }
+  document.getElementById('histModal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function loadHistory(i){
+  try{
+    const hist=JSON.parse(localStorage.getItem('prompt_history')||'[]');
+    const h=hist[i];if(!h)return;
+    document.getElementById('promptEdit').textContent=h.prompt;
+    S.ana=h.prompt;
+    document.getElementById('pr').style.display='block';
+    closeHistory();
+    toast('✓ Prompt loaded dari history');
+  }catch(e){}
+}
+function closeHistory(){
+  document.getElementById('histModal').style.display='none';
+  document.body.style.overflow='';
+}
+
+// ─── Single Analyze ───────────────────────────────────
+async function an(){
+  if(!S.ref&&!S.prod){toast('Upload sekurang-kurangnya satu gambar!','error');return}
+  const btn=document.getElementById('ba');
+  btn.disabled=true;
+  let secs=0;
+  const tmr=setInterval(()=>{secs++;btn.innerHTML=`<span class="sp"></span>Analyzing... ${secs}s`;},1000);
+  try{
+    const c=[];
+    if(S.ref){
+      c.push({type:'image_url',image_url:{url:`data:${S.refMime};base64,${S.ref}`}});
+      c.push({type:'text',text:'[IMAGE 1 — SCENE REFERENCE: Background, model, lighting, pose, camera angle must be preserved 100% exactly as shown]'});
+    }
+    if(S.prod){
+      c.push({type:'image_url',image_url:{url:`data:${S.prodMime};base64,${S.prod}`}});
+      c.push({type:'text',text:S.ref?'[IMAGE 2 — PRODUCT: Only this clothing/product needs to be swapped into the scene]':'[IMAGE 1 — PRODUCT: Generate a professional photo for this product]'});
+    }
+    if(S.ss){
+      c.push({type:'image_url',image_url:{url:`data:${S.ssMime};base64,${S.ss}`}});
+      c.push({type:'text',text:'[IMAGE 3 — PRODUCT INFO SCREENSHOT: Read this screenshot carefully. Extract ALL fabric/material details, color names, texture descriptions, cut/style info, and any other product specifications mentioned. Use these extracted details to make the prompt more accurate and detailed.]'});
+    }
+    const ex=document.getElementById('pd').value.trim();
+    c.push({type:'text',text:buildInstruction(!!S.ref,!!S.prod,ex)});
+    const result=await groq([{role:'user',content:c}],'You are an expert AI image prompt engineer for fashion affiliate. Generate precise prompts with negatives. ALL OUTPUT MUST BE IN ENGLISH ONLY. Never use Bahasa Malaysia or any other language.',true);
+    const combined=parsePromptResult(result);
+    S.ana=combined;
+    document.getElementById('promptEdit').textContent=combined;
+    document.getElementById('pr').style.display='block';
+    unlockCards();
+    saveHistory(combined);
+    setTimeout(()=>document.getElementById('pr').scrollIntoView({behavior:'smooth',block:'start'}),200);
+    toast('✓ Prompt + Negative siap! Edit jika perlu, pastu copy.');
+  }catch(err){toast('Error: '+err.message,'error')}
+  clearInterval(tmr);
+  btn.disabled=false;
+  btn.innerHTML='✨ Analyze & Generate Prompt';
+}
+
+// ─── Batch Analyze ────────────────────────────────────
+async function batchAn(){
+  const prods=S.batchProds.filter(p=>p);
+  if(!S.ref){toast('Upload reference image dulu!','error');return}
+  if(!prods.length){toast('Upload sekurang-kurangnya 1 gambar produk!','error');return}
+  const btn=document.getElementById('bba');
+  btn.disabled=true;
+  const prog=document.getElementById('bprog');
+  const progBar=document.getElementById('bprogbar');
+  prog.style.display='block';progBar.style.width='0%';
+  const ex=document.getElementById('pd').value.trim();
+  const results=[];
+  for(let i=0;i<prods.length;i++){
+    const p=prods[i];
+    btn.innerHTML=`<span class="sp"></span>Produk ${i+1}/${prods.length}...`;
+    progBar.style.width=`${Math.round(((i)/prods.length)*100)}%`;
+    try{
+      const c=[];
+      c.push({type:'image_url',image_url:{url:`data:${S.refMime};base64,${S.ref}`}});
+      c.push({type:'text',text:'[IMAGE 1 — SCENE REFERENCE: Kekal 100% — background, model, lighting, pose semua wajib sama]'});
+      c.push({type:'image_url',image_url:{url:`data:${p.mime};base64,${p.b64}`}});
+      c.push({type:'text',text:'[IMAGE 2 — PRODUCT: Hanya produk ini yang ditukar dalam scene]'});
+      c.push({type:'text',text:buildInstruction(true,true,ex)});
+      const result=await groq([{role:'user',content:c}],'Expert AI image prompt engineer. ALL OUTPUT IN ENGLISH ONLY. Generate precise prompts.',true);
+      results.push({img:p.url,prompt:parsePromptResult(result),idx:i,ok:true});
+    }catch(e){
+      results.push({img:p.url,prompt:'⚠️ Error: '+e.message,idx:i,ok:false});
+    }
+  }
+  progBar.style.width='100%';
+  setTimeout(()=>{prog.style.display='none';progBar.style.width='0%'},800);
+
+  // Render
+  const tabsEl=document.getElementById('batchTabs');
+  const contentEl=document.getElementById('batchContent');
+  tabsEl.innerHTML='';
+  contentEl.innerHTML='';
+  results.forEach((r,i)=>{
+    tabsEl.innerHTML+=`<button class="tab${i===0?' on':''}" id="btab${i}" onclick="showTab(${i},${results.length})">${r.ok?'':'⚠️ '}P${r.idx+1}</button>`;
+    contentEl.innerHTML+=`<div id="bcon${i}" style="display:${i===0?'block':'none'}">
+      <div style="display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:start">
+        <div style="border-radius:9px;overflow:hidden;aspect-ratio:9/16"><img src="${r.img}" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+        <div class="rb2" style="border-color:${r.ok?'rgba(0,229,255,.3)':'rgba(239,68,68,.3)'};background:${r.ok?'rgba(0,229,255,.03)':'rgba(239,68,68,.03)'};margin-top:0">
+          <div class="rh">
+            <span class="rl" style="color:${r.ok?'var(--ac)':'var(--er)'}">📝 Produk ${r.idx+1}</span>
+            ${r.ok?`<button class="cpb" id="bcpb${i}" onclick="cpBatchItem(${i})" style="color:var(--ac);border-color:rgba(0,229,255,.3)">Copy</button>`:''}
+          </div>
+          <div style="font-size:13px;line-height:1.6;color:var(--tx);white-space:pre-wrap;max-height:200px;overflow-y:auto" id="bpt${i}">${r.prompt}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('batchResult').style.display='block';
+  const firstOk=results.find(r=>r.ok);
+  if(firstOk){S.ana=firstOk.prompt;unlockCards();}
+  document.getElementById('batchResult').scrollIntoView({behavior:'smooth',block:'start'});
+  const okCount=results.filter(r=>r.ok).length;
+  toast(`⚡ ${okCount}/${results.length} prompts generated!`, okCount===results.length?'success':'info');
+  btn.disabled=false;btn.innerHTML='⚡ Batch Generate Semua';
+}
+
+function showTab(idx, total){
+  for(let i=0;i<total;i++){
+    const con=document.getElementById('bcon'+i);
+    const tab=document.getElementById('btab'+i);
+    if(con)con.style.display=i===idx?'block':'none';
+    if(tab)tab.classList.toggle('on',i===idx);
+  }
+}
+
+function cpBatchItem(i){
+  const txt=document.getElementById('bpt'+i)?.textContent||'';
+  const btn=document.getElementById('bcpb'+i);
+  const done=()=>{
+    toast('✓ Copied!');
+    if(btn){btn.textContent='✓ Copied';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},2000);}
+  };
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));
+  else fb(txt,done);
+}
+
+// ─── Launch ───────────────────────────────────────────
+function launch(url){
+  const txt=document.getElementById('promptEdit')?.textContent||S.ana;
+  if(!txt.trim()){toast('Generate prompt dulu!','error');return}
+  const done=()=>{
+    toast('✓ Prompt copied! Paste dalam tab yang dibuka','info');
+    window.open(url,'_blank');
+  };
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));
+  else fb(txt,done);
+}
+
+// ─── Caption ──────────────────────────────────────────
+async function genCap(){
+  if(!S.done)return;
+  const btn=document.getElementById('bc');
+  btn.disabled=true;btn.innerHTML='<span class="sp sp-w"></span>Generating...';
+  const ex=document.getElementById('ce').value.trim();
+  const inst={
+    shopee:'Write a Shopee product listing in Bahasa Malaysia.\nFormat:\nSHOPEE_TITLE:\n[catchy title max 100 chars]\nSHOPEE_DESC:\n[3-4 paragraphs: hook, details, benefits, CTA]',
+    tiktok:'Write a TikTok video script in Bahasa Malaysia.\nFormat:\nTIKTOK_HOOK:\n[3s hook]\nTIKTOK_SCRIPT:\n[15-20s script]\nTIKTOK_CTA:\n[5s CTA]\nTIKTOK_CAPTION:\n[caption with emojis]',
+    both:'Write BOTH in Bahasa Malaysia.\nSHOPEE_TITLE:\n[title]\nSHOPEE_DESC:\n[description]\nTIKTOK_HOOK:\n[hook]\nTIKTOK_SCRIPT:\n[script]\nTIKTOK_CTA:\n[CTA]\nTIKTOK_CAPTION:\n[caption]'
+  }[S.cap];
+  try{
+    const res=await groq([{role:'user',content:`Product info:\n${S.ana}\n${ex?'Extra: '+ex+'\n':''}${inst}`}],
+      'Top Malaysian fashion affiliate content creator. Compelling BM captions that drive sales. Natural language.');
+    document.getElementById('cr').style.display='block';
+    if(S.cap==='both'){
+      const title=(res.match(/SHOPEE_TITLE:\n?([\s\S]*?)(?=\nSHOPEE_DESC:|$)/)?.[1]||'').trim();
+      const desc=(res.match(/SHOPEE_DESC:\n?([\s\S]*?)(?=\nTIKTOK_HOOK:|$)/)?.[1]||'').trim();
+      const hook=(res.match(/TIKTOK_HOOK:\n?([\s\S]*?)(?=\nTIKTOK_SCRIPT:|$)/)?.[1]||'').trim();
+      const script=(res.match(/TIKTOK_SCRIPT:\n?([\s\S]*?)(?=\nTIKTOK_CTA:|$)/)?.[1]||'').trim();
+      const cta=(res.match(/TIKTOK_CTA:\n?([\s\S]*?)(?=\nTIKTOK_CAPTION:|$)/)?.[1]||'').trim();
+      const cap=(res.match(/TIKTOK_CAPTION:\n?([\s\S]*?)$/)?.[1]||'').trim();
+      document.getElementById('sct').textContent=`📌 TITLE:\n${title}\n\n📝 DESCRIPTION:\n${desc}`;
+      document.getElementById('tct').textContent=`🎣 HOOK:\n${hook}\n\n🎬 SCRIPT:\n${script}\n\n📢 CTA:\n${cta}\n\n📱 CAPTION:\n${cap}`;
+      document.getElementById('scapbox').style.display='block';
+      document.getElementById('tcapbox').style.display='block';
+    } else if(S.cap==='shopee'){
+      document.getElementById('sct').textContent=res.trim();
+      document.getElementById('scapbox').style.display='block';
+      document.getElementById('tcapbox').style.display='none';
+    } else {
+      document.getElementById('tct').textContent=res.trim();
+      document.getElementById('scapbox').style.display='none';
+      document.getElementById('tcapbox').style.display='block';
+    }
+    document.getElementById('c2').classList.add('done');
+    document.getElementById('b2').textContent='✓ Done';document.getElementById('b2').className='cbadge bd2';
+    toast('✍️ Caption siap!');
+  }catch(err){toast('Gagal: '+err.message,'error')}
+  btn.disabled=false;btn.innerHTML='✍️ Generate Caption';
+}
+
+// ─── Hashtag ──────────────────────────────────────────
+async function gh(){
+  if(!S.done)return;
+  const btn=document.getElementById('bh');
+  btn.disabled=true;btn.innerHTML='<span class="sp sp-w"></span>Generating...';
+  const ex=document.getElementById('he').value.trim();
+  const inst={
+    shopee:'Generate SHOPEE hashtags (max 20). BM+English. Include #ShopeeHaul #BeliDiShopee #ShopeeMY #MurahMurah #BestDeal. Output one line, space-separated.',
+    tiktok:'Generate TIKTOK AFFILIATE hashtags (max 25). Include #TikTokShop #TikTokAffiliate #TikTokMY #FYP #viral. Output one line, space-separated.',
+    both:'Format EXACTLY:\nSHOPEE:\n[max 20 hashtags BM+English #ShopeeHaul #BeliDiShopee #ShopeeMY]\n\nTIKTOK:\n[max 25 hashtags #TikTokShop #TikTokAffiliate #TikTokMY #FYP #viral]\n\nTIPS:\n[2-3 tips ringkas cara guna hashtag untuk max reach]'
+  }[S.ht];
+  try{
+    const res=await groq([{role:'user',content:`Product: ${S.ana}\n${ex?'Extra: '+ex+'\n':''}${inst}`}],
+      'Malaysian e-commerce affiliate expert. Targeted hashtags for Malaysian fashion buyers.');
+    document.getElementById('hr').style.display='block';
+    if(S.ht==='both'){
+      document.getElementById('st').textContent=(res.match(/SHOPEE:\n?([\s\S]*?)(?=\nTIKTOK:|$)/)?.[1]||'').trim();
+      document.getElementById('tt').textContent=(res.match(/TIKTOK:\n?([\s\S]*?)(?=\nTIPS:|$)/)?.[1]||'').trim();
+      document.getElementById('ht2').textContent=(res.match(/TIPS:\n?([\s\S]*?)$/)?.[1]||'').trim();
+      document.getElementById('sb').style.display='block';document.getElementById('tb').style.display='block';
+    } else if(S.ht==='shopee'){
+      document.getElementById('st').textContent=res.trim();
+      document.getElementById('sb').style.display='block';document.getElementById('tb').style.display='none';
+      document.getElementById('ht2').textContent='Letak hashtag dalam description produk dan caption Shopee.';
+    } else {
+      document.getElementById('tt').textContent=res.trim();
+      document.getElementById('sb').style.display='none';document.getElementById('tb').style.display='block';
+      document.getElementById('ht2').textContent='#FYP dan #TikTokShop wajib ada setiap video.';
+    }
+    document.getElementById('c3').classList.add('done');
+    document.getElementById('b3').textContent='✓ Done';document.getElementById('b3').className='cbadge bd2';
+    toast('# Hashtags generated!');
+  }catch(err){toast('Gagal: '+err.message,'error')}
+  btn.disabled=false;btn.innerHTML='# Generate Hashtags';
+}
+
+// ─── Video Prompt ─────────────────────────────────────
+async function gv(){
+  if(!S.done)return;
+  const btn=document.getElementById('bv');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span>Generating...';
+  const ex=document.getElementById('ve').value.trim();
+  const pg={
+    'Grok Aurora 6s':'Platform: Grok Aurora (xAI) 6 second video. ONE main motion. Concise and vivid. Max 120 words for main prompt.',
+    'Grok Aurora 10s':'Platform: Grok Aurora (xAI) 10 second video. Can have 2 motion phases. Max 180 words for main prompt.',
+    'Google Flow 8s':'Platform: Google Flow (VideoFX) 8 second video. Descriptive — include subject, environment, lighting, camera movement, mood.'
+  }[S.pl]||'Platform: '+S.pl;
+  try{
+    const res=await groq([{role:'user',content:`SCENE CONTEXT:\n${S.ana}\n\n${pg}\n${ex?'USER INSTRUCTION: '+ex+'\n':''}\nGenerate a complete video prompt in ENGLISH ONLY. Combine everything into ONE block in this exact format:\n\nVIDEO PROMPT: [main cinematic prompt in English]\n\n--no [negative terms in English]\n\nCAMERA: [camera type, motion speed, duration notes in English]\n\nIMPORTANT: Everything must be in English. No Bahasa Malaysia.`}],
+      `Expert video AI prompt engineer for ${S.pl}. Generate cinematic English prompts only. Combine prompt, negative, and camera into one formatted block.`);
+
+    // Combine all into one clean block
+    const vidP=(res.match(/VIDEO PROMPT:\s*([\s\S]*?)(?=\n--no|\nCAMERA:|$)/)?.[1]||res).trim();
+    const neg=(res.match(/--no\s*([\s\S]*?)(?=\nCAMERA:|$)/)?.[1]||'blurry, low quality, distorted, deformed hands, bad anatomy, watermark').trim();
+    const cam=(res.match(/CAMERA:\s*([\s\S]*?)$/)?.[1]||'Smooth cinematic motion, 24fps, 9:16 vertical').trim();
+
+    const combined=`${vidP}\n\n--no ${neg}\n\nCAMERA: ${cam}`;
+
+    document.getElementById('vp').textContent=combined;
+    document.getElementById('vpl').textContent=S.pl;
+    document.getElementById('vr').style.display='block';
+    document.getElementById('c4').classList.add('done');
+    document.getElementById('b4').textContent='✓ Done';document.getElementById('b4').className='cbadge bd2';
+    toast('🎬 Video prompt generated!');
+  }catch(err){toast('Gagal: '+err.message,'error')}
+  btn.disabled=false;btn.innerHTML='🎬 Generate Video Prompt';
+}
+
+// ─── Export All ───────────────────────────────────────
+function exportAll(){
+  const sections=[];
+  const sep='═'.repeat(50);
+  const prompt=document.getElementById('promptEdit')?.textContent;
+  const shopee=document.getElementById('sct')?.textContent;
+  const tiktok=document.getElementById('tct')?.textContent;
+  const hashS=document.getElementById('st')?.textContent;
+  const hashT=document.getElementById('tt')?.textContent;
+  const vidP=document.getElementById('vp')?.textContent;
+  if(prompt?.trim())sections.push(`${sep}\n📝 IMAGE PROMPT + NEGATIVE\n${sep}\n${prompt}`);
+  if(shopee?.trim())sections.push(`${sep}\n🛍️ SHOPEE LISTING\n${sep}\n${shopee}`);
+  if(tiktok?.trim())sections.push(`${sep}\n🎵 TIKTOK SCRIPT\n${sep}\n${tiktok}`);
+  if(hashS?.trim())sections.push(`${sep}\n# SHOPEE HASHTAGS\n${sep}\n${hashS}`);
+  if(hashT?.trim())sections.push(`${sep}\n# TIKTOK HASHTAGS\n${sep}\n${hashT}`);
+  if(vidP?.trim())sections.push(`${sep}\n🎬 VIDEO PROMPT (${S.pl})\n${sep}\n${vidP}`);
+  if(!sections.length){toast('Generate content dulu sebelum export!','error');return}
+  const txt=`AI CREATIVE STUDIO\nExport: ${new Date().toLocaleString('ms-MY')}\n\n${sections.join('\n\n')}`;
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);
+  a.download=`ai-studio-${Date.now()}.txt`;
+  a.click();
+  toast('💾 Export downloaded!');
+}
+
+// ─── Copy with visual feedback ────────────────────────
+function cpEdit(id){
+  const txt=document.getElementById(id)?.textContent||'';
+  const btnEl=document.getElementById('cpbMain');
+  const done=()=>{
+    toast('✓ Prompt copied!');
+    if(btnEl){btnEl.textContent='✓ Copied';btnEl.classList.add('copied');setTimeout(()=>{btnEl.textContent='Copy All';btnEl.classList.remove('copied')},2000);}
+  };
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));
+  else fb(txt,done);
+}
+
+function cpBtn(elId, btnId){
+  const txt=document.getElementById(elId)?.textContent||'';
+  const btnEl=document.getElementById(btnId);
+  const done=()=>{
+    toast('✓ Copied!');
+    if(btnEl){btnEl.textContent='✓';btnEl.classList.add('copied');setTimeout(()=>{btnEl.textContent='Copy';btnEl.classList.remove('copied')},2000);}
+  };
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));
+  else fb(txt,done);
+}
+
+function fb(txt, cb){
+  const ta=document.createElement('textarea');
+  ta.value=txt;ta.style.cssText='position:fixed;left:-9999px;top:-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta);if(cb)cb();
+}
+
+// ─── Load saved key ───────────────────────────────────
+window.addEventListener('load',()=>{
+  const k=localStorage.getItem('openrouter_key');
+  if(k){document.getElementById('gk').value=k;document.getElementById('sc').checked=true;ck();}
+  renderBatchGrid();
+  // Close history on backdrop click
+  document.getElementById('histModal').addEventListener('click',function(e){
+    if(e.target===this)closeHistory();
+  });
+});
+</script>
+</body>
+</html>
