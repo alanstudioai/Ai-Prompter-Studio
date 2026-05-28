@@ -188,6 +188,13 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 
 /* Scrollbar global */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+
+/* Product grid */
+#prodGrid .buz{max-height:160px}
+#prodGrid .bpw{max-height:160px}
+
+/* Ref library grid hover */
+#refLibGrid>div:hover{border-color:var(--ac)!important;transform:scale(1.02);transition:all .2s}
 </style>
 </head>
 <body>
@@ -263,19 +270,12 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
         <img id="i1" src="" alt="ref">
         <button class="rb" onclick="rst('ref')">✕ Reset</button>
       </div>
+      <button class="btn btn-ghost" style="margin-top:6px;padding:8px 12px;font-size:11px" onclick="openRefLib()">📂 Library (<span id="refLibCount">0</span>)</button>
+      <button class="btn btn-ghost" id="saveRefBtn" style="margin-top:4px;padding:8px 12px;font-size:11px;display:none" onclick="saveToRefLib()">💾 Simpan ke Library</button>
     </div>
     <div>
-      <div class="ul">📦 Produk</div>
-      <div class="uz" id="u2" ondragover="dv(event,'u2')" ondragleave="dl('u2')" ondrop="dd(event,'prod')">
-        <input type="file" accept="image/*" onchange="fi(event,'prod')">
-        <div class="ico">📦</div>
-        <h3>Product</h3>
-        <p>Gambar produk / baju</p>
-      </div>
-      <div class="pw" id="p2">
-        <img id="i2" src="" alt="prod">
-        <button class="rb" onclick="rst('prod')">✕ Reset</button>
-      </div>
+      <div class="ul">📦 Produk (1-3 gambar)</div>
+      <div id="prodGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px"></div>
     </div>
   </div>
 
@@ -507,6 +507,19 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
   </div>
 </div>
 
+<!-- Scene Reference Library Modal -->
+<div id="refLibModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:150;padding:20px;overflow-y:auto">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;max-width:600px;margin:0 auto;padding:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">📂 Scene Reference Library</div>
+      <button onclick="closeRefLib()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--mu);cursor:pointer;padding:6px 12px;font-size:13px">Tutup</button>
+    </div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:12px">Tap gambar untuk guna sebagai reference. Tiada limit simpanan.</div>
+    <div id="refLibGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+    <div id="refLibEmpty" style="text-align:center;color:var(--mu);padding:30px;font-size:13px;display:none">Belum ada reference disimpan. Upload gambar dan klik "💾 Simpan ke Library".</div>
+  </div>
+</div>
+
 </div>
 <div class="toast" id="toast"></div>
 
@@ -514,7 +527,7 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 // ─── State ────────────────────────────────────────────
 const S={
   ref:null, refMime:'image/jpeg',
-  prod:null, prodMime:'image/jpeg',
+  prods:[null,null,null], // up to 3 product images
   ss:null, ssMime:'image/jpeg',
   batchProds:[null,null,null,null,null],
   mode:'single',
@@ -561,10 +574,12 @@ function te(){
 // ─── Reset All ────────────────────────────────────────
 function resetAll(){
   if(!confirm('Reset semua? Semua output dan gambar akan dibuang.'))return;
-  S.ref=null;S.prod=null;S.ss=null;S.batchProds=[null,null,null,null,null];S.ana='';S.done=false;
-  ['u1','u2'].forEach(id=>document.getElementById(id).style.display='flex');
-  ['p1','p2'].forEach(id=>document.getElementById(id).style.display='none');
-  ['i1','i2'].forEach(id=>document.getElementById(id).src='');
+  S.ref=null;S.prods=[null,null,null];S.ss=null;S.batchProds=[null,null,null,null,null];S.ana='';S.done=false;
+  document.getElementById('u1').style.display='flex';
+  document.getElementById('p1').style.display='none';
+  document.getElementById('i1').src='';
+  document.getElementById('saveRefBtn').style.display='none';
+  renderProdGrid();
   // Reset screenshot
   document.getElementById('ssZone').style.display='flex';
   document.getElementById('ssPreview').style.display='none';
@@ -643,26 +658,122 @@ function li(file, t){
       const pw=document.getElementById('p1');
       pw.style.display='block';pw.classList.add('just-uploaded');
       setTimeout(()=>pw.classList.remove('just-uploaded'),500);
+      document.getElementById('saveRefBtn').style.display='block';
     } else if(t==='ss'){
       S.ss=b64;S.ssMime=mime;
       document.getElementById('ssImg').src=url;
       document.getElementById('ssZone').style.display='none';
       document.getElementById('ssPreview').style.display='block';
-    } else {
-      S.prod=b64;S.prodMime=mime;
-      document.getElementById('i2').src=url;
-      document.getElementById('u2').style.display='none';
-      const pw=document.getElementById('p2');
-      pw.style.display='block';pw.classList.add('just-uploaded');
-      setTimeout(()=>pw.classList.remove('just-uploaded'),500);
+    } else if(t.startsWith('prod')){
+      const idx=parseInt(t.replace('prod',''));
+      S.prods[idx]={b64,mime,url};
+      renderProdGrid();
     }
     toast(`✓ ${t==='ref'?'Reference':t==='ss'?'Screenshot':'Produk'} uploaded!`);
   };r.readAsDataURL(file);
 }
 function rst(t){
-  if(t==='ref'){S.ref=null;document.getElementById('u1').style.display='flex';document.getElementById('p1').style.display='none';}
+  if(t==='ref'){S.ref=null;document.getElementById('u1').style.display='flex';document.getElementById('p1').style.display='none';document.getElementById('saveRefBtn').style.display='none';}
   else if(t==='ss'){S.ss=null;document.getElementById('ssZone').style.display='flex';document.getElementById('ssPreview').style.display='none';document.getElementById('ssImg').src='';}
-  else{S.prod=null;document.getElementById('u2').style.display='flex';document.getElementById('p2').style.display='none';}
+  else if(t.startsWith('prod')){
+    const idx=parseInt(t.replace('prod',''));
+    S.prods[idx]=null;
+    renderProdGrid();
+  }
+}
+
+// ─── Product Grid (1-3 images) ────────────────────────
+function renderProdGrid(){
+  const g=document.getElementById('prodGrid');
+  if(!g)return;
+  g.innerHTML='';
+  for(let i=0;i<3;i++){
+    const p=S.prods[i];
+    const req=i===0?'<span style="color:var(--er);font-size:9px">WAJIB</span>':'<span style="color:var(--mu);font-size:9px">OPTIONAL</span>';
+    if(p){
+      g.innerHTML+=`<div>
+        <div style="font-size:9px;font-weight:700;color:var(--mu);text-align:center;margin-bottom:3px">P${i+1} ${req}</div>
+        <div class="bpw"><img src="${p.url}" style="width:100%;height:100%;object-fit:cover;display:block"><button class="rb" onclick="rst('prod${i}')">✕</button></div>
+      </div>`;
+    } else {
+      g.innerHTML+=`<div>
+        <div style="font-size:9px;font-weight:700;color:var(--mu);text-align:center;margin-bottom:3px">P${i+1} ${req}</div>
+        <label class="buz" style="aspect-ratio:9/16;max-height:160px"><input type="file" accept="image/*" onchange="addProd(event,${i})">📦<span>Tap</span></label>
+      </div>`;
+    }
+  }
+}
+function addProd(e,i){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const url=ev.target.result;
+    S.prods[i]={url,b64:url.split(',')[1],mime:url.split(';')[0].split(':')[1]||'image/jpeg'};
+    renderProdGrid();
+    toast(`✓ Produk ${i+1} uploaded`);
+  };r.readAsDataURL(f);
+}
+
+// ─── Scene Reference Library ──────────────────────────
+function getRefLib(){try{return JSON.parse(localStorage.getItem('ref_library')||'[]')}catch(e){return[]}}
+function saveRefLib(lib){localStorage.setItem('ref_library',JSON.stringify(lib))}
+function updateRefLibCount(){
+  const el=document.getElementById('refLibCount');
+  if(el)el.textContent=getRefLib().length;
+}
+function saveToRefLib(){
+  if(!S.ref){toast('Upload reference dulu!','error');return}
+  const lib=getRefLib();
+  const name=prompt('Nama untuk reference ini (optional):','Scene '+(lib.length+1))||'Scene '+(lib.length+1);
+  lib.unshift({b64:S.ref,mime:S.refMime,name,time:new Date().toLocaleString('ms-MY')});
+  saveRefLib(lib);
+  updateRefLibCount();
+  toast('✓ Reference disimpan ke Library!');
+}
+function openRefLib(){
+  const lib=getRefLib();
+  const grid=document.getElementById('refLibGrid');
+  const empty=document.getElementById('refLibEmpty');
+  if(!lib.length){
+    grid.style.display='none';empty.style.display='block';
+  } else {
+    grid.style.display='grid';empty.style.display='none';
+    grid.innerHTML=lib.map((item,i)=>`
+      <div style="position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--bd);cursor:pointer;transition:all .2s" onclick="useRefFromLib(${i})">
+        <img src="data:${item.mime};base64,${item.b64}" style="width:100%;aspect-ratio:9/16;object-fit:cover;display:block">
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:6px 8px">
+          <div style="font-size:10px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.6)">${item.time}</div>
+        </div>
+        <button onclick="event.stopPropagation();deleteRefFromLib(${i})" style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);border:none;border-radius:5px;color:#fff;font-size:9px;padding:3px 6px;cursor:pointer;min-height:20px">✕</button>
+      </div>`).join('');
+  }
+  document.getElementById('refLibModal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeRefLib(){
+  document.getElementById('refLibModal').style.display='none';
+  document.body.style.overflow='';
+}
+function useRefFromLib(i){
+  const lib=getRefLib();
+  const item=lib[i];if(!item)return;
+  S.ref=item.b64;S.refMime=item.mime;
+  document.getElementById('i1').src=`data:${item.mime};base64,${item.b64}`;
+  document.getElementById('u1').style.display='none';
+  document.getElementById('p1').style.display='block';
+  document.getElementById('saveRefBtn').style.display='block';
+  closeRefLib();
+  toast(`✓ "${item.name}" loaded sebagai reference`);
+}
+function deleteRefFromLib(i){
+  if(!confirm('Delete reference ini?'))return;
+  const lib=getRefLib();
+  lib.splice(i,1);
+  saveRefLib(lib);
+  updateRefLibCount();
+  openRefLib(); // refresh grid
+  toast('✓ Reference deleted','info');
 }
 
 // ─── OpenRouter API with Auto-Fallback ────────────────
@@ -834,27 +945,40 @@ function closeHistory(){
 
 // ─── Single Analyze ───────────────────────────────────
 async function an(){
-  if(!S.ref&&!S.prod){toast('Upload sekurang-kurangnya satu gambar!','error');return}
+  const hasProds=S.prods.filter(p=>p).length>0;
+  if(!S.ref&&!hasProds){toast('Upload sekurang-kurangnya satu gambar!','error');return}
+  if(!S.prods[0]&&hasProds){toast('Produk 1 (P1) wajib diisi!','error');return}
   const btn=document.getElementById('ba');
   btn.disabled=true;
   let secs=0;
   const tmr=setInterval(()=>{secs++;btn.innerHTML=`<span class="sp"></span>Analyzing... ${secs}s`;},1000);
   try{
     const c=[];
+    let imgIdx=1;
     if(S.ref){
       c.push({type:'image_url',image_url:{url:`data:${S.refMime};base64,${S.ref}`}});
-      c.push({type:'text',text:'[IMAGE 1 — SCENE REFERENCE: Background, model, lighting, pose, camera angle must be preserved 100% exactly as shown]'});
+      c.push({type:'text',text:`[IMAGE ${imgIdx} — SCENE REFERENCE: Background, model, lighting, pose, camera angle must be preserved 100% exactly as shown]`});
+      imgIdx++;
     }
-    if(S.prod){
-      c.push({type:'image_url',image_url:{url:`data:${S.prodMime};base64,${S.prod}`}});
-      c.push({type:'text',text:S.ref?'[IMAGE 2 — PRODUCT: Only this clothing/product needs to be swapped into the scene]':'[IMAGE 1 — PRODUCT: Generate a professional photo for this product]'});
-    }
+    const activeProds=S.prods.filter(p=>p);
+    activeProds.forEach((p,i)=>{
+      c.push({type:'image_url',image_url:{url:`data:${p.mime};base64,${p.b64}`}});
+      if(activeProds.length===1){
+        c.push({type:'text',text:S.ref?`[IMAGE ${imgIdx} — PRODUCT: Only this clothing/product needs to be swapped into the scene]`:`[IMAGE ${imgIdx} — PRODUCT: Generate a professional photo for this product]`});
+      } else {
+        c.push({type:'text',text:`[IMAGE ${imgIdx} — PRODUCT ${i+1} of ${activeProds.length}: ${i===0?'Main product to feature':'Additional angle/detail of the same product for better accuracy'}]`});
+      }
+      imgIdx++;
+    });
     if(S.ss){
       c.push({type:'image_url',image_url:{url:`data:${S.ssMime};base64,${S.ss}`}});
-      c.push({type:'text',text:'[IMAGE 3 — PRODUCT INFO SCREENSHOT: Read this screenshot carefully. Extract ALL fabric/material details, color names, texture descriptions, cut/style info, and any other product specifications mentioned. Use these extracted details to make the prompt more accurate and detailed.]'});
+      c.push({type:'text',text:`[IMAGE ${imgIdx} — PRODUCT INFO SCREENSHOT: Read this screenshot carefully. Extract ALL fabric/material details, color names, texture descriptions, cut/style info, and any other product specifications mentioned. Use these extracted details to make the prompt more accurate and detailed.]`});
+      imgIdx++;
     }
     const ex=document.getElementById('pd').value.trim();
-    c.push({type:'text',text:buildInstruction(!!S.ref,!!S.prod,ex)});
+    const hasProd=activeProds.length>0;
+    const multiProdNote=activeProds.length>1?`\nNOTE: Multiple product images provided (${activeProds.length} images). Use ALL product images to get the most accurate description of color, texture, cut, and details. Combine observations from all product angles into one comprehensive prompt.`:'';
+    c.push({type:'text',text:buildInstruction(!!S.ref,hasProd,ex)+multiProdNote});
     const result=await groq([{role:'user',content:c}],'You are an expert AI image prompt engineer for fashion affiliate. Generate precise prompts with negatives. ALL OUTPUT MUST BE IN ENGLISH ONLY. Never use Bahasa Malaysia or any other language.',true);
     const combined=parsePromptResult(result);
     S.ana=combined;
@@ -1134,9 +1258,14 @@ window.addEventListener('load',()=>{
   const k=localStorage.getItem('openrouter_key');
   if(k){document.getElementById('gk').value=k;document.getElementById('sc').checked=true;ck();}
   renderBatchGrid();
-  // Close history on backdrop click
+  renderProdGrid();
+  updateRefLibCount();
+  // Close modals on backdrop click
   document.getElementById('histModal').addEventListener('click',function(e){
     if(e.target===this)closeHistory();
+  });
+  document.getElementById('refLibModal').addEventListener('click',function(e){
+    if(e.target===this)closeRefLib();
   });
 });
 </script>
