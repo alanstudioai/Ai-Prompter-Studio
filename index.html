@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Creative Studio</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00e5ff">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -374,6 +379,20 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
         💡 Klik button → prompt auto-copy → tab baru buka → paste + upload kedua gambar
       </div>
     </div>
+
+    <!-- Prompt Remix -->
+    <div style="margin-top:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--ac2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎨 Prompt Remix — Tukar Style</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button class="tag" onclick="remixPrompt('luxury')" style="font-size:11px">💎 Luxury</button>
+        <button class="tag" onclick="remixPrompt('minimal')" style="font-size:11px">🖤 Minimal</button>
+        <button class="tag" onclick="remixPrompt('raya')" style="font-size:11px">🌙 Raya Vibes</button>
+        <button class="tag" onclick="remixPrompt('casual')" style="font-size:11px">☀️ Casual</button>
+        <button class="tag" onclick="remixPrompt('studio')" style="font-size:11px">📸 Studio Clean</button>
+        <button class="tag" onclick="remixPrompt('outdoor')" style="font-size:11px">🌿 Outdoor</button>
+      </div>
+      <div style="font-size:10px;color:var(--mu);margin-top:5px">Tap untuk remix prompt dengan style berbeza — AI tweak tanpa regenerate dari awal</div>
+    </div>
   </div>
 
   <!-- Batch Result -->
@@ -489,6 +508,55 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 
 <div class="conn">↓</div>
 
+<!-- CARD 5: Competitor Spy -->
+<div class="card" id="c5" style="--cc:#ef4444">
+  <div class="ch">
+    <div class="cn" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)">🕵️</div>
+    <div><div class="ct">Competitor Spy Mode</div><div class="cs">Screenshot competitor → AI reverse-engineer prompt</div></div>
+    <span class="cbadge br" id="b5">Ready</span>
+  </div>
+  <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Upload screenshot/gambar dari TikTok/Shopee competitor — AI akan analyze dan generate prompt yang sama atau lebih baik.</div>
+  <div id="spyZone" class="uz" style="aspect-ratio:unset;max-height:unset;padding:14px;border-color:rgba(239,68,68,.3)" ondragover="dv(event,'spyZone')" ondragleave="dl('spyZone')" ondrop="dd(event,'spy')">
+    <input type="file" accept="image/*" onchange="fi(event,'spy')">
+    <div class="ico">🕵️</div>
+    <h3 style="color:#ef4444">Upload Competitor Image/SS</h3>
+    <p>TikTok video SS / Shopee listing / IG post</p>
+  </div>
+  <div id="spyPreview" style="display:none;margin-top:8px">
+    <img id="spyImg" src="" alt="spy" style="width:100%;border-radius:10px;max-height:240px;object-fit:contain;background:var(--sf2);display:block">
+    <button onclick="rst('spy')" style="margin-top:6px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;color:var(--er);font-size:11px;padding:5px 10px;cursor:pointer">✕ Remove</button>
+  </div>
+  <span class="il">🎯 Apa yang kau nak (optional)</span>
+  <textarea id="spyExtra" rows="2" placeholder="Contoh: aku nak sama tapi lebih luxury / aku nak style lighting dia je / aku nak pose macam tu..."></textarea>
+  <div class="trow" style="margin-top:8px">
+    <span class="tag on" onclick="sel(this,'spyMode','replicate')">🎯 Replicate Style</span>
+    <span class="tag" onclick="sel(this,'spyMode','better')">⚡ Buat Lebih Baik</span>
+    <span class="tag" onclick="sel(this,'spyMode','analyze')">🔍 Analyze Sahaja</span>
+  </div>
+  <button class="btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff" id="spyBtn" onclick="spyAnalyze()">🕵️ Spy & Generate Prompt</button>
+  <div id="spyResult" style="display:none">
+    <div class="rb2" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.03)">
+      <div class="rh">
+        <span class="rl" style="color:#ef4444">🕵️ Competitor Analysis + Prompt</span>
+        <button class="cpb" id="cpbSpy" onclick="cpBtn('spyText','cpbSpy')" style="color:#ef4444;border-color:rgba(239,68,68,.3)">Copy</button>
+      </div>
+      <div class="rt" id="spyText"></div>
+    </div>
+  </div>
+</div>
+
+<div class="conn">↓</div>
+
+<!-- One-Click Full Package -->
+<div class="card" style="--cc:var(--ac2);text-align:center;padding:16px 20px">
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px">⚡ One-Click Full Package</div>
+  <div style="font-size:11px;color:var(--mu);margin-bottom:10px">Generate SEMUA sekaligus — Prompt + Caption + Hashtag + Video Prompt</div>
+  <button class="btn" style="background:linear-gradient(135deg,var(--ac2),#9333ea);color:#fff;margin-top:0" id="fullPkgBtn" onclick="fullPackage()">🚀 Generate Full Package</button>
+  <div class="prog" id="fpProg" style="margin-top:8px"><div class="prog-bar" id="fpProgBar"></div></div>
+</div>
+
+<div class="conn">↓</div>
+
 <!-- Export All -->
 <div class="card" style="--cc:#34d399;text-align:center;padding:16px 20px">
   <button class="btn btn-export" style="margin-top:0" onclick="exportAll()">
@@ -529,6 +597,7 @@ const S={
   ref:null, refMime:'image/jpeg',
   prods:[null,null,null], // up to 3 product images
   ss:null, ssMime:'image/jpeg',
+  spy:null, spyMime:'image/jpeg', spyMode:'replicate',
   batchProds:[null,null,null,null,null],
   mode:'single',
   ht:'both', cap:'both', pl:'Grok Aurora 6s',
@@ -639,7 +708,8 @@ function dv(e,id){e.preventDefault();document.getElementById(id).classList.add('
 function dl(id){document.getElementById(id).classList.remove('drag')}
 function dd(e,t){
   e.preventDefault();
-  const id=t==='ref'?'u1':'u2';
+  const idMap={ref:'u1',ss:'ssZone',spy:'spyZone'};
+  const id=idMap[t]||'u1';
   document.getElementById(id).classList.remove('drag');
   const f=e.dataTransfer.files[0];
   if(f&&f.type.startsWith('image/'))li(f,t);
@@ -664,6 +734,11 @@ function li(file, t){
       document.getElementById('ssImg').src=url;
       document.getElementById('ssZone').style.display='none';
       document.getElementById('ssPreview').style.display='block';
+    } else if(t==='spy'){
+      S.spy=b64;S.spyMime=mime;
+      document.getElementById('spyImg').src=url;
+      document.getElementById('spyZone').style.display='none';
+      document.getElementById('spyPreview').style.display='block';
     } else if(t.startsWith('prod')){
       const idx=parseInt(t.replace('prod',''));
       S.prods[idx]={b64,mime,url};
@@ -675,6 +750,7 @@ function li(file, t){
 function rst(t){
   if(t==='ref'){S.ref=null;document.getElementById('u1').style.display='flex';document.getElementById('p1').style.display='none';document.getElementById('saveRefBtn').style.display='none';}
   else if(t==='ss'){S.ss=null;document.getElementById('ssZone').style.display='flex';document.getElementById('ssPreview').style.display='none';document.getElementById('ssImg').src='';}
+  else if(t==='spy'){S.spy=null;document.getElementById('spyZone').style.display='flex';document.getElementById('spyPreview').style.display='none';document.getElementById('spyImg').src='';}
   else if(t.startsWith('prod')){
     const idx=parseInt(t.replace('prod',''));
     S.prods[idx]=null;
@@ -1253,6 +1329,112 @@ function fb(txt, cb){
   document.body.removeChild(ta);if(cb)cb();
 }
 
+// ─── Prompt Remix ─────────────────────────────────────
+async function remixPrompt(style){
+  const current=document.getElementById('promptEdit')?.textContent||S.ana;
+  if(!current.trim()){toast('Generate prompt dulu!','error');return}
+  const styles={
+    luxury:'Rewrite this prompt with a LUXURY high-end feel — think gold accents, marble, premium lighting, elegant pose, rich color grading, designer boutique atmosphere.',
+    minimal:'Rewrite this prompt with MINIMALIST aesthetic — clean white/neutral background, simple composition, soft shadows, less props, focus on the product only.',
+    raya:'Rewrite this prompt with HARI RAYA / festive Malaysian vibes — warm golden lighting, traditional elements, pelita/lantern bokeh, rich jewel tones, celebratory mood.',
+    casual:'Rewrite this prompt with CASUAL everyday vibes — natural outdoor light, relaxed pose, street style, candid feel, warm tones.',
+    studio:'Rewrite this prompt with CLEAN STUDIO look — pure white/grey seamless background, professional studio lighting, product-focused, commercial photography style.',
+    outdoor:'Rewrite this prompt with OUTDOOR NATURE setting — golden hour sunlight, greenery/garden/beach background, natural wind effect on fabric, lifestyle photography.'
+  };
+  const btn=event.target;
+  btn.disabled=true;btn.style.opacity='.5';
+  try{
+    const res=await groq([{role:'user',content:`Original prompt:\n${current}\n\n${styles[style]}\n\nKeep the same format: main prompt + --no negative. Keep product details accurate. ALL IN ENGLISH.`}],
+      'Expert prompt engineer. Remix the style while keeping product accuracy. Output format: prompt text then --no negative terms.');
+    const remixed=parsePromptResult(res);
+    document.getElementById('promptEdit').textContent=remixed;
+    S.ana=remixed;
+    saveHistory(remixed);
+    toast(`✓ Remixed ke ${style} style!`);
+  }catch(err){toast('Gagal: '+err.message,'error')}
+  btn.disabled=false;btn.style.opacity='1';
+}
+
+// ─── Competitor Spy Mode ──────────────────────────────
+async function spyAnalyze(){
+  if(!S.spy){toast('Upload gambar competitor dulu!','error');return}
+  const btn=document.getElementById('spyBtn');
+  btn.disabled=true;
+  let secs=0;
+  const tmr=setInterval(()=>{secs++;btn.innerHTML=`<span class="sp sp-w"></span>Analyzing... ${secs}s`;},1000);
+  const extra=document.getElementById('spyExtra').value.trim();
+  const mode=S.spyMode||'replicate';
+  const modeInst={
+    replicate:'Reverse-engineer this image and generate a prompt that would REPLICATE this exact style, lighting, composition, and mood. The goal is to recreate something very similar.',
+    better:'Analyze this image, identify what makes it good, then generate a BETTER version — improve lighting, composition, or styling while keeping the same general concept.',
+    analyze:'Provide a detailed ANALYSIS of this image: lighting setup, camera angle, color grading, styling choices, what makes it effective for selling. Then generate a prompt inspired by it.'
+  }[mode];
+  try{
+    const c=[
+      {type:'image_url',image_url:{url:`data:${S.spyMime};base64,${S.spy}`}},
+      {type:'text',text:`[COMPETITOR IMAGE — Analyze this image from a competitor's TikTok/Shopee/IG post]\n\n${modeInst}\n${extra?'User notes: '+extra+'\n':''}\nOutput format:\nANALYSIS:\n[Brief analysis of what makes this image effective — lighting, pose, composition, style]\n\nPROMPT:\n[Complete prompt to recreate/improve this style]\n\nNEGATIVE:\n[Negative terms]\n\nALL OUTPUT IN ENGLISH ONLY.`}
+    ];
+    const res=await groq([{role:'user',content:c}],'Expert visual analyst and AI prompt engineer. Reverse-engineer competitor content into actionable prompts. ALL ENGLISH.',true);
+    document.getElementById('spyText').textContent=res;
+    document.getElementById('spyResult').style.display='block';
+    document.getElementById('b5').textContent='✓ Done';document.getElementById('b5').className='cbadge bd2';
+    toast('🕵️ Competitor analyzed!');
+  }catch(err){toast('Gagal: '+err.message,'error')}
+  clearInterval(tmr);
+  btn.disabled=false;btn.innerHTML='🕵️ Spy & Generate Prompt';
+}
+
+// ─── One-Click Full Package ───────────────────────────
+async function fullPackage(){
+  const hasProds=S.prods.filter(p=>p).length>0;
+  if(!S.ref&&!hasProds){toast('Upload gambar dulu (reference / produk)!','error');return}
+  const btn=document.getElementById('fullPkgBtn');
+  btn.disabled=true;
+  const prog=document.getElementById('fpProg');
+  const progBar=document.getElementById('fpProgBar');
+  prog.style.display='block';
+  const steps=['Image Prompt','Caption','Hashtags','Video Prompt'];
+  let step=0;
+  const updateProg=()=>{
+    step++;
+    progBar.style.width=`${Math.round((step/steps.length)*100)}%`;
+    btn.innerHTML=`<span class="sp sp-w"></span>${steps[step-1]}... (${step}/${steps.length})`;
+  };
+  try{
+    // Step 1: Generate image prompt
+    updateProg();
+    if(!S.ana||!S.done){
+      await an(); // this sets S.ana and unlocks cards
+      await sleep(2000); // wait for rate limit
+    }
+    if(!S.ana){throw new Error('Image prompt gagal');}
+
+    // Step 2: Caption
+    updateProg();
+    await sleep(2000);
+    S.cap='both';
+    await genCap();
+
+    // Step 3: Hashtags
+    updateProg();
+    await sleep(2000);
+    S.ht='both';
+    await gh();
+
+    // Step 4: Video Prompt
+    updateProg();
+    await sleep(2000);
+    await gv();
+
+    progBar.style.width='100%';
+    toast('🚀 Full Package siap! Semua content generated.','success');
+  }catch(err){
+    toast('Partial: '+err.message,'error');
+  }
+  setTimeout(()=>{prog.style.display='none';progBar.style.width='0%'},1000);
+  btn.disabled=false;btn.innerHTML='🚀 Generate Full Package';
+}
+
 // ─── Load saved key ───────────────────────────────────
 window.addEventListener('load',()=>{
   const k=localStorage.getItem('openrouter_key');
@@ -1267,6 +1449,10 @@ window.addEventListener('load',()=>{
   document.getElementById('refLibModal').addEventListener('click',function(e){
     if(e.target===this)closeRefLib();
   });
+  // Register Service Worker (PWA)
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').then(()=>console.log('SW registered')).catch(e=>console.warn('SW failed:',e));
+  }
 });
 </script>
 </body>

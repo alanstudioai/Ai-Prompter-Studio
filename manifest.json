@@ -1,0 +1,18 @@
+{
+  "name": "AI Creative Studio",
+  "short_name": "AI Studio",
+  "description": "Upload gambar → AI generate prompt → Copy ke Google Flow / Grok / Kling",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080b12",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
