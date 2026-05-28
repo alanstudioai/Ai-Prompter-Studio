@@ -24,7 +24,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* Header */
 .app-header{position:sticky;top:0;z-index:100;background:rgba(6,9,15,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);padding:12px 16px;display:flex;align-items:center;gap:10px}
-.app-header img{width:30px;height:30px;border-radius:8px;object-fit:cover}
+.app-header img{width:34px;height:34px;border-radius:9px;object-fit:cover;box-shadow:0 2px 8px rgba(0,229,255,.1)}
 .app-header .brand{display:flex;align-items:center;gap:10px;flex:1}
 .brand-text{display:flex;flex-direction:column}
 .app-header .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;background:linear-gradient(135deg,#fff 30%,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
@@ -208,6 +208,13 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 .full-pkg-card{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(0,229,255,.05));border:1px solid rgba(124,58,237,.3)}
 .full-pkg-card:hover{border-color:rgba(124,58,237,.5)}
 
+/* Hero section */
+.hero-section{text-align:center;padding:24px 16px 20px;margin-bottom:8px}
+.hero-logo{width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 8px 32px rgba(0,229,255,.15),0 2px 8px rgba(0,0,0,.4);border:2px solid rgba(0,229,255,.2);animation:logoGlow 3s ease-in-out infinite alternate}
+@keyframes logoGlow{0%{box-shadow:0 8px 32px rgba(0,229,255,.15),0 2px 8px rgba(0,0,0,.4)}100%{box-shadow:0 8px 40px rgba(124,58,237,.2),0 2px 8px rgba(0,0,0,.4)}}
+.hero-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#fff 30%,var(--ac) 70%,var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.hero-sub{font-size:12px;color:var(--mu);max-width:320px;margin:0 auto}
+
 /* Section title in tabs */
 .section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
 .section-title::after{content:'';flex:1;height:1px;background:var(--bd)}
@@ -231,6 +238,13 @@ textarea::placeholder,.ta::placeholder{color:var(--mu)}
 
 <!-- ═══════════════ TAB: GENERATE ═══════════════ -->
 <div class="tab-panel active" id="panelGenerate">
+
+  <!-- Hero with Logo -->
+  <div class="hero-section">
+    <img src="logo.png" alt="AI Creative Studio" class="hero-logo">
+    <h1 class="hero-title">AI Creative Studio</h1>
+    <p class="hero-sub">Upload gambar → AI generate prompt → Copy ke Google Flow / Grok / Kling</p>
+  </div>
 
   <!-- One-Click Full Package (prominent) -->
   <div class="card full-pkg-card" style="--cc:var(--ac2);text-align:center;padding:16px 20px;margin-top:4px">
