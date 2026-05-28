@@ -670,16 +670,23 @@ const VISION_MODELS=[
   'google/gemma-4-31b-it:free',
   'google/gemma-4-26b-a4b-it:free',
   'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
-  'nvidia/nemotron-nano-12b-v2-vl:free'
+  'nvidia/nemotron-nano-12b-v2-vl:free',
+  'openrouter/free'
 ];
 const TEXT_MODELS=[
+  'openrouter/free',
   'deepseek/deepseek-v4-flash:free',
   'nvidia/nemotron-3-super-120b-a12b:free',
   'openai/gpt-oss-120b:free',
   'google/gemma-4-31b-it:free',
   'minimax/minimax-m2.5:free',
-  'z-ai/glm-4.5-air:free'
+  'z-ai/glm-4.5-air:free',
+  'openai/gpt-oss-20b:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
+  'poolside/laguna-m.1:free'
 ];
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function groq(msgs, sys, vis=false){
   const key=gk();
@@ -689,6 +696,7 @@ async function groq(msgs, sys, vis=false){
   let lastErr='';
   for(let i=0;i<models.length;i++){
     const model=models[i];
+    if(i>0)await sleep(1500); // delay 1.5s antara retry untuk elak rate limit
     try{
       const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',
@@ -716,7 +724,7 @@ async function groq(msgs, sys, vis=false){
       continue;
     }
   }
-  throw new Error(`Semua ${models.length} model gagal. Last error: ${lastErr}`);
+  throw new Error(`Semua model busy (rate limit). Cuba lagi dalam 1-2 minit.`);
 }
 
 // ─── Build Prompt ─────────────────────────────────────
